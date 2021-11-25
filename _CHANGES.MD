@@ -1,0 +1,22 @@
+# SBS CHANGELOG
+
+## 0.0.0.2
+
+- Did some minor code touch-up.
+
+- The program now generates a "database" of thoughts that have been hand-picked by the program (cleaned/filtered out).
+
+## 0.0.0.1
+
+- Added beginning code.
+
+- Added Text-to-Speech functionality (provided by Amazon Polly).
+
+- Added the ability to store private config variables in the .env file locally.
+  - This can be accomplished by running the program and inputting the required information.
+
+- Added logging capabilites (outputs to 'sbs.log' in the root project folder).
+
+- Added an [_TODO.MD](_TODO.MD) with some improvement ideas.
+
+- Added a ['requirements.txt'](requirements.txt) file.

@@ -131,3 +131,4 @@ dmypy.json
 # Custom items:
 *.log
 *.mp3
+thoughts/
