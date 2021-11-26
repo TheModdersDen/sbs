@@ -1,5 +1,11 @@
 # SBS CHANGELOG
 
+## 0.0.0.3
+
+- Added support for custom profanity words (via the 'badwords.txt' file in the 'data' folder.).
+
+- Worked more on the profanity filter.
+
 ## 0.0.0.2
 
 - Did some minor code touch-up.

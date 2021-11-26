@@ -11,6 +11,7 @@ import feedparser
 import glob
 from time import sleep
 from elevate import elevate
+import re
 
 from sbs_vars import SBS_vars
 from utils import Utils
@@ -44,7 +45,13 @@ class SBS():
             self.update_frequency = self.vars.update_frequency
 
     def isProfane(self, input):
-        if predict_prob([input]) >= [0.1] or predict([input]) == [1]:
+        badwords_list = []
+        with open("data/badwords.txt", "r+") as badwords_file:
+            badwords = badwords_file.readlines()
+            for word in badwords:
+                word = word.strip("\n")
+                badwords_list.append(word)
+        if predict_prob([input]) >= [0.1] or predict([input]) == [1] or word in [input]:
             return True
         else:
             return False
@@ -64,6 +71,8 @@ class SBS():
         d = feedparser.parse(
             "https://reddit.com/r/showerthoughts/top.rss?t=" + update_frequency)
         post_index = 0
+        thoughts = ['ShowerThoughts Database File:',
+                    f"{self.vars.currentDate}--{self.vars.current_time}"]
         for post in d.entries:
             if self.isProfane(post.title):
                 print(f"NOT ADDING: '{post.title}' as it is profane.")
@@ -74,28 +83,31 @@ class SBS():
                 print(f"ADDING: '{post.title}' as it is NOT profane.")
                 self.vars.utils.LOG_INFO(
                     f"ADDING: '{post.title}' as it is NOT profane.")
-                self.create_tts_file(
-                    post.title, os.getcwd(), f"polly_out{post_index}.mp3")
-        thoughts = ['ShowerThoughts Database File:',
-                    f"{self.vars.currentDate}--{self.vars.current_time}"]
-        for post in d.entries:
-            thoughts.append(post.title)
-        thoughts.append(
-            "That's all for today! Come back tomorrow for more ShowerThoughts.")
+                if post_index < 10:
+                    self.create_tts_file(
+                        post.title, os.getcwd(), f"polly_out0{post_index}.mp3")
+                    thoughts.append(post.title)
+                else:
+                    self.create_tts_file(
+                        post.title, os.getcwd(), f"polly_out{post_index}.mp3")
+                    thoughts.append(post.title)
+        post_index += 1
+        self.create_tts_file(
+            "That's all for today! Come back tomorrow for more ShowerThoughts.", os.getcwd(), f"polly_out{post_index}.mp3")
+        thoughts.append("That's all for today! Come back tomorrow for more ShowerThoughts.")
         self.vars.utils.create_file_from_path(f"{os.getcwd()}/thoughts/")
         with open(self.thought_file, "w+") as thought_file:
             for thought in thoughts:
                 thought_file.write(thought + "\n")
 
     def create_tts_file(self, data, out_dir_var,  out_file_name):
-        polly_command = f'cd {out_dir_var} && sudo aws polly synthesize-speech --text-type ssml --output-format "mp3" --voice-id "Salli" --engine neural --text "<speak>{data}</speak>" {out_file_name}'
+        polly_command = f'cd {out_dir_var} && sudo aws polly synthesize-speech --text-type ssml --output-format "mp3" --voice-id "Salli" --engine neural --text "<speak>{data}<break time= \\"1s\\"/></speak>" {out_file_name}'
         print(polly_command)
         os.system(polly_command)
 
     def make_polly_file(self, out_dir_var):
         file_names = ""
-        tts_files = glob.glob(f'{out_dir_var}/*.mp3')
-        tts_files.sort()
+        tts_files = sorted( filter(os.path.isfile, glob.glob(os.getcwd() + '/*.mp3', recursive=False) ) )
         for tts_file in tts_files:
             file_names += f" {tts_file}"
         file_names = file_names[1:]
