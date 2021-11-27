@@ -20,28 +20,31 @@ class SBS():
 
     vars = SBS_vars()
 
-    def is_root(self):
-            return os.getuid() == 0
+    def is_root():
+        return os.getuid() == 0
+
+    feed = "https://reddit.com/r/showerthoughts/top.rss?t="
+    env_vars_dict = {}
+    vars_list = {}
+    utils = Utils()
+
+    thought_file = f"thoughts/thoughts-{vars.currentDate}--{vars.current_time}.txt"
+    thoughts_data = None
+
+    if is_root() == False:
+        elevate()
+    else:
+        utils.LOG_DEBUG(
+            "Process is running as administrator/root. No need to elevate.")
+
+        main_url = vars.main_url
+        out_dir = vars.out_dir
+        out_file = vars.out_file
+        feed_dir = vars.feed_dir
+        update_frequency = vars.update_frequency
 
     def __init__(self):
-        self.feed = "https://reddit.com/r/showerthoughts/top.rss?t="
-        self.env_vars_dict = {}
-        self.vars_list = {}
-        self.utils = Utils()
-
-        self.thought_file = f"thoughts/thoughts-{self.vars.currentDate}--{self.vars.current_time}.txt"
-        self.thoughts_data = None
-
-        if self.is_root() == False:
-            elevate()
-        else:
-            self.utils.LOG_DEBUG(
-                "Process is running as administrator/root. No need to elevate.")
-
-            self.main_url = self.vars.main_url
-            self.out_dir = self.vars.out_dir
-            self.feed_dir = self.vars.feed_dir
-            self.update_frequency = self.vars.update_frequency
+        pass
 
     def isProfane(self, input):
         badwords_list = []
@@ -50,7 +53,7 @@ class SBS():
             for word in badwords:
                 word = word.strip("\n")
                 badwords_list.append(word)
-        if predict_prob([input]) >= [0.1] or predict([input]) == [1] or word in [input]:
+        if predict_prob([input]) >= [0.1] or predict([input]) == [1] or word.lower() in [input]:
             return True
         else:
             return False
@@ -93,7 +96,8 @@ class SBS():
         post_index += 1
         self.create_tts_file(
             "That's all for today! Come back tomorrow for more ShowerThoughts.", os.getcwd(), f"polly_out{post_index}.mp3")
-        thoughts.append("That's all for today! Come back tomorrow for more ShowerThoughts.")
+        thoughts.append(
+            "That's all for today! Come back tomorrow for more ShowerThoughts.")
         self.vars.utils.create_file_from_path(f"{os.getcwd()}/thoughts/")
         with open(self.thought_file, "w+") as thought_file:
             for thought in thoughts:
@@ -106,7 +110,8 @@ class SBS():
 
     def make_polly_file(self, out_dir_var):
         file_names = ""
-        tts_files = sorted( filter(os.path.isfile, glob.glob(os.getcwd() + '/*.mp3', recursive=False) ) )
+        tts_files = sorted(filter(os.path.isfile, glob.glob(
+            os.getcwd() + '/*.mp3', recursive=False)))
         for tts_file in tts_files:
             file_names += f" {tts_file}"
         file_names = file_names[1:]
@@ -162,7 +167,8 @@ class SBS():
         currentOS = self.getCurrentOS()
         self.vars.utils.LOG_INFO(f"Current OS type is: '{platform.system()}.'")
         if currentOS == 0:
-            self.vars.utils.create_file_from_path("/var/www/html/st/polly_out/")
+            self.vars.utils.create_file_from_path(
+                "/var/www/html/st/polly_out/")
         elif currentOS == 1:
             print("Your OS, Windows, is currently not supported. Exiting gracefully...")
             self.vars.utils.LOG_ERROR(
