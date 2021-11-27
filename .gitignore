@@ -132,3 +132,4 @@ dmypy.json
 *.log
 *.mp3
 thoughts/
+VARS_SET

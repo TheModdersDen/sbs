@@ -11,7 +11,6 @@ import feedparser
 import glob
 from time import sleep
 from elevate import elevate
-import re
 
 from sbs_vars import SBS_vars
 from utils import Utils
@@ -21,22 +20,22 @@ class SBS():
 
     vars = SBS_vars()
 
+    def is_root(self):
+            return os.getuid() == 0
+
     def __init__(self):
         self.feed = "https://reddit.com/r/showerthoughts/top.rss?t="
         self.env_vars_dict = {}
         self.vars_list = {}
-        utils = Utils()
+        self.utils = Utils()
 
         self.thought_file = f"thoughts/thoughts-{self.vars.currentDate}--{self.vars.current_time}.txt"
         self.thoughts_data = None
 
-        def is_root():
-            return os.getuid() == 0
-
-        if is_root() == False:
+        if self.is_root() == False:
             elevate()
         else:
-            utils.LOG_DEBUG(
+            self.utils.LOG_DEBUG(
                 "Process is running as administrator/root. No need to elevate.")
 
             self.main_url = self.vars.main_url
