@@ -1,5 +1,6 @@
-from decouple import config
 from profanity_check import predict, predict_prob
+from profanity_filter.profanity_filter import ProfanityFilter
+from profanity_filter.config import Config
 import urllib.request
 import codecs
 import datetime
@@ -11,7 +12,7 @@ import feedparser
 import glob
 from time import sleep
 from elevate import elevate
-
+from profanity_filter.types_ import AnalysisType
 from sbs_vars import SBS_vars
 from utils import Utils
 
@@ -30,7 +31,8 @@ class SBS():
 
     thought_file = f"thoughts/thoughts-{vars.currentDate}--{vars.current_time}.txt"
     thoughts_data = None
-
+    badwords_list = []
+    
     if is_root() == False:
         elevate()
     else:
@@ -47,16 +49,24 @@ class SBS():
         pass
 
     def isProfane(self, input):
-        badwords_list = []
         with open("data/badwords.txt", "r+") as badwords_file:
             badwords = badwords_file.readlines()
             for word in badwords:
                 word = word.strip("\n")
-                badwords_list.append(word)
-        if predict_prob([input]) >= [0.1] or predict([input]) == [1] or word.lower() in [input]:
-            return True
-        else:
-            return False
+                self.badwords_list.append(word)
+        pf = ProfanityFilter()
+        pf.config = Config(
+            analyses=[AnalysisType.DEEP],
+            languages=['en_core_web_sm'],
+        )
+        pf.extra_profane_word_dictionaries={"en_core_web_sm": set(self.badwords_list)}
+        
+        return (
+            predict_prob([input]) >= [0.1]
+            or predict([input]) == [1]
+            or word.lower() in [input]
+            or pf.is_profane(input)
+        )
 
     def getCurrentOS(self):
         if platform.system() == "Linux":
@@ -67,6 +77,7 @@ class SBS():
             return 2  # macOS
 
     def processRedditFeed(self, update_frequency):
+        # sourcery skip: hoist-statement-from-if
         if self.update_frequency not in ["day", "hour"]:
             raise Exception(
                 "Please put in either 'day' or 'hour' as a timeframe for the Reddit feed.")
@@ -109,20 +120,16 @@ class SBS():
         os.system(polly_command)
 
     def make_polly_file(self, out_dir_var):
-        file_names = ""
         tts_files = sorted(filter(os.path.isfile, glob.glob(
             os.getcwd() + '/*.mp3', recursive=False)))
-        for tts_file in tts_files:
-            file_names += f" {tts_file}"
+        file_names = "".join(f" {tts_file}" for tts_file in tts_files)
         file_names = file_names[1:]
         merge_command = f"cat {file_names} >polly_output{self.vars.currentId}.mp3"
         os.system(merge_command)
         self.vars.utils.LOG_DEBUG("Running command: '" + merge_command + "'")
         file_names = ""
         for tts_file in tts_files:
-            if tts_file == "_intro.mp3" or tts_file == "z_outro.mp3":
-                continue
-            else:
+            if tts_file not in ["_intro.mp3", "z_outro.mp3"]:
                 file_names += f" {tts_file}"
         cleanup_command = f"rm {file_names}"
         os.system(cleanup_command)
@@ -161,7 +168,9 @@ class SBS():
     def main(self):
         version_URL = urllib.request.urlopen(f"{self.vars.main_url}ST_VERSION")
         self.vars.utils.LOG_DEBUG(
-            f"result code for version_URL: {str(version_URL.getcode())}".strip("\n"))
+            f'result code for version_URL: {version_URL.getcode()}'.strip("\n")
+        )
+
         data = version_URL.read()
         print(f"Starting SBS v{data}... Please wait.")
         currentOS = self.getCurrentOS()
@@ -170,22 +179,26 @@ class SBS():
             self.vars.utils.create_file_from_path(
                 "/var/www/html/st/polly_out/")
         elif currentOS == 1:
-            print("Your OS, Windows, is currently not supported. Exiting gracefully...")
-            self.vars.utils.LOG_ERROR(
-                "Your OS, Windows, is currently not supported. Exiting gracefully...")
-            sleep(5)
-            exit(1)
+            self._finish_and_exit(
+                "Your OS, Windows, is currently not supported. Exiting gracefully..."
+            )
+
         elif currentOS == 2:
-            print(
-                "Your OS, Darwin (AKA: macOS or Mac OS X), is currently not supported. Exiting gracefully...")
-            self.vars.utils.LOG_ERROR(
-                "Your OS, Darwin (AKA: macOS or Mac OS X), is currently not supported. Exiting gracefully...")
-            sleep(5)
-            exit(1)
+            self._finish_and_exit(
+                "Your OS, Darwin (AKA: macOS or Mac OS X), is currently not supported. Exiting gracefully..."
+            )
+
         print(self.update_frequency)
         self.processRedditFeed(self.feed + self.update_frequency)
         self.make_polly_file(os.getcwd())
         self.create_rss_feed()
+
+    # TODO Rename this here and in `main`
+    def _finish_and_exit(self, message):
+        print(message)
+        self.vars.utils.LOG_ERROR(message)
+        sleep(5)
+        exit(1)
 
 
 if __name__ == "__main__":

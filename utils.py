@@ -10,9 +10,9 @@ class Utils():
         if not os.path.exists(os.path.dirname(file_path)):
             try:
                 os.makedirs(os.path.dirname(file_path))
-            except (OSError, Exception, PermissionError) as exc:
-                self.utils.LOG_ERROR(f"{exc}")
-                print(f"ERROR: {exc}")
+            except (OSError, Exception) as exc:
+                self.utils.LOG_ERROR(f'{exc}')
+                print(f'ERROR: {exc}')
 
     def getLogger(self):
         logging.basicConfig(filename="sbs.log",
@@ -29,10 +29,7 @@ class Utils():
     def is_file_empty(self, file_path):
         """ Check if file is empty by confirming if its size is 0 bytes"""
         # Check if file exist and it is empty
-        if os.path.exists(file_path) and os.stat(file_path).st_size == 0:
-            return True
-        else:
-            return False
+        return bool(os.path.exists(file_path) and os.stat(file_path).st_size == 0)
 
     def get_file_size(self, file_name):
         statinfo = os.stat(file_name)

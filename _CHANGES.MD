@@ -1,5 +1,11 @@
 # SBS CHANGELOG
 
+## 0.0.0.4
+
+- Fix profanity filter more so it catches more profanity/crap
+
+- Fix pytest file to make it work better (and actually function)
+
 ## 0.0.0.3
 
 - Added support for custom profanity words (via the 'badwords.txt' file in the 'data' folder.).
