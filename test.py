@@ -1,7 +1,5 @@
 from utils import Utils
-from sbs_vars import SBS_vars
 
-vars = SBS_vars()
 utils = Utils()
 
 distro_name = vars.distro
