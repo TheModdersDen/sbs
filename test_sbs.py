@@ -1,3 +1,4 @@
+import platform
 import pytest
 import os
 import glob
@@ -25,6 +26,19 @@ def test_processRedditFeed():
         for lines in thought_file.readlines():
             clean_lines = lines.strip()
         assert(clean_lines) == "That's all for today! Come back tomorrow for more ShowerThoughts."
+
+def test_getCurrentOS():
+    os_type = -1
+    
+    if platform.system() == "Linux":
+        os_type = 0  # Linux
+    elif platform.system() == "Windows":
+        os_type = 1  # Windows
+    elif platform.system() == "Darwin":
+        os_type = 2  # macOS
+        
+    assert(SBS.getCurrentOS()) == os_type
+    
 
 # Call the main function that is part of pytest so that
 # the test functions in this file will start executing.

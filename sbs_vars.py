@@ -7,6 +7,7 @@ from decouple import config
 class SBS_vars():
     utils = Utils()
     
+    # Initialize local variables.
     def __init__(self):
         self.createEnvVars()
         self.main_url = config("TTS_MAIN_URL")
@@ -36,6 +37,7 @@ class SBS_vars():
 
         self.feed_description = "This is an expiremental feed to use Amazon Polly to read the ShowerThoughts Reddit page to end users."
 
+    # Create the needed environment variables.
     def createEnvVars(self):
         if os.path.isfile(".env") == False or self.utils.is_file_empty(".env"):
             with open(".env", "w+") as env_file:
@@ -43,7 +45,8 @@ class SBS_vars():
             self.utils.LOG_DEBUG("Done writing program environment variables.")
         elif self.utils.is_file_empty(".env") == False or os.path.exists(".env") == True:
             self.utils.LOG_DEBUG("'.env' file exists. Continuing...")
-            
+    
+    # Ask for the user's input for the "secret" variables, so that they can be stored privately.
     def ask_for_input(self, env_file):
         url_input=str(input(
             "What is the main URL which will be read by the Alexa Skill? (A full URL w/o quotes): "))

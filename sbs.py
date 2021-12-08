@@ -32,18 +32,22 @@ class SBS():
     thoughts_data = None
     badwords_list = []
     
+    # Checks to see if the program is running as Admin/root. If not, elevate the program so it is.
     if is_root() == False:
         elevate()
     else:
         utils.LOG_DEBUG(
             "Process is running as administrator/root. No need to elevate.")
 
+        # Define some local variables and point them to the ones in the variables file.
         main_url = vars.main_url
         out_dir = vars.out_dir
         out_file = vars.out_file
         feed_dir = vars.feed_dir
         update_frequency = vars.update_frequency
 
+    # Check to see if a certain word, phrase, or even paragraph is profane. 
+    # This has the capability to do deep-learning profanity checking as well.
     def isProfane(self, input):
         with open(os.getcwd() + os.path.sep + "data" + os.path.sep +"badwords.txt", "r+") as badwords_file:
             badwords = badwords_file.readlines()
@@ -72,7 +76,8 @@ class SBS():
         or pf.is_profane(input)
         )
 
-    def getCurrentOS(self):
+    # Get the current OS type and send it back as an integer.
+    def getCurrentOS():
         if platform.system() == "Linux":
             return 0  # Linux
         elif platform.system() == "Windows":
@@ -80,6 +85,7 @@ class SBS():
         elif platform.system() == "Darwin":
             return 2  # macOS
 
+    # Proccess the /r/ShowerThoughts reddit RSS feed.
     def processRedditFeed(self, update_frequency):
         break_words = [" posted ", " said ", " thought ", " stated ", " remarked ", " commented "]
         
@@ -122,11 +128,13 @@ class SBS():
             for thought in thoughts:
                 thought_file.write(thought + "\n")
 
+    # Create a text-to-speech file.
     def create_tts_file(self, data, out_dir_var,  out_file_name):
         polly_command = f'cd {out_dir_var} && sudo aws polly synthesize-speech --text-type ssml --output-format "mp3" --voice-id "Salli" --engine neural --text "<speak>{data}<break time= \\"1s\\"/></speak>" {out_file_name}'
         print(polly_command)
         os.system(polly_command)
 
+    # Make a singular file, which is a combination of all the TTS files generated above.
     def make_polly_file(self):
         tts_files = sorted(filter(os.path.isfile, glob.glob(
             os.getcwd() + os.path.sep + '*.mp3', recursive=False)))
@@ -147,6 +155,7 @@ class SBS():
         self.vars.utils.LOG_DEBUG("Running command: '" + move_command + "'")
         os.system(move_command)
 
+    # Generate an RSS feed to be read by ALEXA.
     def create_rss_feed(self):
         test_feed = Rss201rev2Feed(
             title="ShowerThoughts Briefing Feed",
@@ -173,6 +182,7 @@ class SBS():
             rss_feed.write(test_feed.writeString(self.vars.encoding_type))
             rss_feed.close()
 
+    # The main function.
     def main(self):
         version_URL = urllib.request.urlopen(f"{self.vars.main_url}ST_VERSION")
         self.vars.utils.LOG_DEBUG(
@@ -217,6 +227,7 @@ class SBS():
         self.make_polly_file()
         self.create_rss_feed()
 
+    # Finish and exit with a nice message is the OS is not supported.
     def _finish_and_exit_neatly(self, message):
         print(message)
         self.utils.LOG_ERROR(message)
