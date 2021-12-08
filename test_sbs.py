@@ -36,8 +36,9 @@ def test_getCurrentOS():
         os_type = 1  # Windows
     elif platform.system() == "Darwin":
         os_type = 2  # macOS
-        
-    assert(SBS.getCurrentOS()) == os_type
+    
+    sbs = SBS()
+    assert(sbs.getCurrentOS()) == os_type
     
 
 # Call the main function that is part of pytest so that

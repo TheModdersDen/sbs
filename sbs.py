@@ -77,7 +77,7 @@ class SBS():
         )
 
     # Get the current OS type and send it back as an integer.
-    def getCurrentOS():
+    def getCurrentOS(self):
         if platform.system() == "Linux":
             return 0  # Linux
         elif platform.system() == "Windows":
