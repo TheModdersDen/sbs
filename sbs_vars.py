@@ -15,9 +15,6 @@ class SBS_vars():
         self.update_frequency = config("REFRESH_RATE")
         self.feed_link_extension = config("FEED_LINK_EXT")
         
-        self.distro = self.utils.get_distro_name()
-        self.distro_version = self.utils.get_distro_version()
-        
         self.uuid = uuid4()
         self.currentId = str(self.uuid)
         self.URN_UUID = self.uuid.urn

@@ -2,8 +2,8 @@ from utils import Utils
 
 utils = Utils()
 
-distro_name = vars.distro
-distro_ver = vars.distro_version
+distro_name = utils.distro
+distro_ver = utils.distro_version
 utils.LOG_DEBUG(f"You are running {distro_name} v{distro_ver}.")
 if distro_name in ["Ubuntu".lower(), "Debian".lower(), "Kali".lower(), "raspbian".lower()]:  
     utils.create_file_from_path(

@@ -1,6 +1,5 @@
 import logging
 import os
-import platform
 import csv
 
 class Utils():
@@ -68,6 +67,8 @@ class Utils():
 
     def __init__(self):
         self.logger = self.getLogger()
+        self.distro = self.get_distro_name()
+        self.distro_version = self.get_distro_version()
 
     def is_file_empty(self, file_path):
         """ Check if file is empty by confirming if its size is 0 bytes"""
