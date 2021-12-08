@@ -1,5 +1,11 @@
 # SBS CHANGELOG
 
+## 0.0.0.5
+
+- Add credit to the post author while Alexa speaks out the thought.
+
+- Begin work on Windows support (which will be limited)
+
 ## 0.0.0.4
 
 - Fix profanity filter more so it catches more profanity/crap
