@@ -1,4 +1,3 @@
-from distutils import util
 import os
 from utils import Utils
 from uuid import uuid4
@@ -14,7 +13,11 @@ class SBS_vars():
         self.out_dir = config("TTS_OUT_DIR")
         self.feed_dir = config("FEED_DIR")
         self.update_frequency = config("REFRESH_RATE")
-
+        self.feed_link_extension = config("FEED_LINK_EXT")
+        
+        self.distro = self.utils.get_distro_name()
+        self.distro_version = self.utils.get_distro_version()
+        
         self.uuid = uuid4()
         self.currentId = str(self.uuid)
         self.URN_UUID = self.uuid.urn
@@ -27,19 +30,23 @@ class SBS_vars():
             f"The current date and time is: '{self.currentDate}--{self.current_time}.'")
         self.out_file = f"polly_output{self.currentId}.mp3"
         self.feed_title = f"Your ShowerThoughts Update ({self.currentDate}--{self.current_time})"
-        self.feed_link = self.main_url + f"polly_out/polly_output{self.currentId}.mp3"
+        self.feed_link = (
+            self.main_url +
+            self.feed_link_extension
+            + '/polly_output{self.currentId}.mp3'
+        )
+
         self.feed_description = "This is an expiremental feed to use Amazon Polly to read the ShowerThoughts Reddit page to end users."
 
     def createEnvVars(self):
-        if os.path.isfile(f"{os.getcwd()}/.env") == False or self.utils.is_file_empty(f"{os.getcwd()}/.env"):
+        if os.path.isfile(f"{os.getcwd()}/.env") == False or self.utils.is_file_empty(f"{os.getcwd()}" + os.path.sep + ".env"):
             with open(f"{os.getcwd()}/.env", "w+") as env_file:
-                self._extracted_from_createEnvVars_4(env_file)
+                self.ask_for_input(env_file)
             self.utils.LOG_DEBUG("Done writing program environment variables.")
-        elif self.utils.is_file_empty(f"{os.getcwd()}/.env") == False or os.path.exists(f"{os.getcwd()}/.env") == True:
+        elif self.utils.is_file_empty(f"{os.getcwd()}" + os.path.sep + ".env") == False or os.path.exists(f"{os.getcwd()}" + os.path.sep + ".env") == True:
             self.utils.LOG_DEBUG("'.env' file exists. Continuing...")
-
-    # TODO Rename this here and in `createEnvVars`
-    def _extracted_from_createEnvVars_4(self, env_file):
+            
+    def ask_for_input(self, env_file):
         url_input=str(input(
             "What is the main URL which will be read by the Alexa Skill? (A full URL w/o quotes): "))
         if url_input is None:
@@ -72,3 +79,11 @@ class SBS_vars():
         self.utils.LOG_DEBUG(
             f"Writing '{refresh_rate}' as the 'REFRESH_RATE' variable.")
         env_file.write(f"REFRESH_RATE={refresh_rate}\n")
+        feed_link_extension=str(input(
+            "What is the path (after the MAIN_URL) in which the Text-to-Speech files will be stored on the web server? (An example would be 'st/out', w/o quotes): "))
+        if feed_link_extension is None:
+            raise Exception(
+                "Please make that the 'FEED_LINK_EXT' input is a valid URL path that leads to the folder with the TTS files folder.\nRun this program to try again.")
+        self.utils.LOG_DEBUG(
+            f"Writing '{feed_link_extension}' as the 'FEED_LINK_EXT' variable.")
+        env_file.write(f"FEED_LINK_EXT={self.feed_link_extension}\n")

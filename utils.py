@@ -1,10 +1,53 @@
 import logging
 import os
-from getpass import getpass
+import platform
+import csv
 
 class Utils():
 
     logger = None
+    
+    def get_distro_name(self):  # sourcery skip: class-extract-method
+
+        RELEASE_DATA = {}
+
+        with open("/etc/os-release") as f:
+            reader = csv.reader(f, delimiter="=")
+            for row in reader:
+                if row:
+                    RELEASE_DATA[row[0]] = row[1]
+
+        if RELEASE_DATA["ID"] in ["debian", "raspbian"]:
+            with open("/etc/debian_version") as f:
+                DEBIAN_VERSION = f.readline().strip()
+            major_version = DEBIAN_VERSION.split(".")[0]
+            version_split = RELEASE_DATA["VERSION"].split(" ", maxsplit=1)
+            if version_split[0] == major_version:
+                # Just major version shown, replace it with the full version
+                RELEASE_DATA["VERSION"] = " ".join([DEBIAN_VERSION] + version_split[1:])
+
+        return "{}".format(RELEASE_DATA["NAME"])
+    
+    def get_distro_version(self):
+
+        RELEASE_DATA = {}
+
+        with open("/etc/os-release") as f:
+            reader = csv.reader(f, delimiter="=")
+            for row in reader:
+                if row:
+                    RELEASE_DATA[row[0]] = row[1]
+
+        if RELEASE_DATA["ID"] in ["debian", "raspbian"]:
+            with open("/etc/debian_version") as f:
+                DEBIAN_VERSION = f.readline().strip()
+            major_version = DEBIAN_VERSION.split(".")[0]
+            version_split = RELEASE_DATA["VERSION"].split(" ", maxsplit=1)
+            if version_split[0] == major_version:
+                # Just major version shown, replace it with the full version
+                RELEASE_DATA["VERSION"] = " ".join([DEBIAN_VERSION] + version_split[1:])
+
+        return "{}".format(RELEASE_DATA["VERSION"])
     
     def create_file_from_path(self, file_path):
         if not os.path.exists(os.path.dirname(file_path)):
@@ -15,7 +58,7 @@ class Utils():
                 print(f'ERROR: {exc}')
 
     def getLogger(self):
-        logging.basicConfig(filename="sbs.log",
+        logging.basicConfig(filename=os.getcwd() + os.path.sep + "sbs.log",
                             format='%(asctime)s %(message)s',
                             filemode='w')
         logger = logging.getLogger()

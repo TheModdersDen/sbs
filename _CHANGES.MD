@@ -27,8 +27,8 @@
 - Added the ability to store private config variables in the .env file locally.
   - This can be accomplished by running the program and inputting the required information.
 
-- Added logging capabilites (outputs to 'sbs.log' in the root project folder).
+- Added logging capabilities (outputs to 'sbs.log' in the root project folder).
 
-- Added an [_TODO.MD](_TODO.MD) with some improvement ideas.
+- Added a [_TODO.MD](_TODO.MD) with some improvement ideas.
 
 - Added a ['requirements.txt'](requirements.txt) file.
