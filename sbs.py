@@ -11,9 +11,10 @@ import glob
 from time import sleep
 from elevate import elevate
 from profanity_filter.types_ import AnalysisType
+import random
+
 from sbs_vars import SBS_vars
 from utils import Utils
-
 
 class SBS():
 
@@ -27,7 +28,7 @@ class SBS():
     vars_list = {}
     utils = Utils()
 
-    thought_file = f"thoughts" + os.path.sep +"thoughts-{vars.currentDate}--{vars.current_time}.txt"
+    thought_file = f"thoughts" + os.path.sep +f"thoughts-{vars.currentDate}--{vars.current_time}.txt"
     thoughts_data = None
     badwords_list = []
     
@@ -80,6 +81,8 @@ class SBS():
             return 2  # macOS
 
     def processRedditFeed(self, update_frequency):
+        break_words = [" posted ", " said ", " thought ", " stated ", " remarked ", " commented "]
+        
         # sourcery skip: hoist-statement-from-if
         if self.update_frequency not in ["day", "hour"]:
             raise Exception(
@@ -90,29 +93,31 @@ class SBS():
         thoughts = ['ShowerThoughts Database File:',
                     f"{self.vars.currentDate}--{self.vars.current_time}"]
         for post in d.entries:
-            if self.isProfane(post.title):
+            post.author = str(post.author).strip("/u/").replace("_", "-")
+            if self.isProfane(post.title) or self.isProfane(post.author):
                 print(f"NOT ADDING: '{post.title}' as it is profane.")
                 self.vars.utils.LOG_INFO(
                     f"NOT ADDING: '{post.title}' as it is profane.")
             else:
                 post_index += 1
-                print(f"ADDING: '{post.title}' as it is NOT profane.")
+                print(f"ADDING: '{post.title}' by '{post.author}' as it is NOT profane.")
                 self.vars.utils.LOG_INFO(
-                    f"ADDING: '{post.title}' as it is NOT profane.")
+                    f"ADDING: '{post.title}' by '{post.author}' as it is NOT profane.")
+                current_break_word = random.choice(break_words)
                 if post_index < 10:
                     self.create_tts_file(
-                        post.title, os.getcwd(), f"polly_out0{post_index}.mp3")
-                    thoughts.append(post.title)
+                        post.author + current_break_word + "'" + post.title + "'", os.getcwd(), f"polly_out0{post_index}.mp3")
+                    thoughts.append(post.author + current_break_word + "'" + post.title + "'")
                 else:
                     self.create_tts_file(
                         post.title, os.getcwd(), f"polly_out{post_index}.mp3")
-                    thoughts.append(post.title)
+                    thoughts.append(post.author + current_break_word + "'" + post.title + "'")
         post_index += 1
         self.create_tts_file(
             "That's all for today! Come back tomorrow for more ShowerThoughts.", os.getcwd(), f"polly_out{post_index}.mp3")
         thoughts.append(
             "That's all for today! Come back tomorrow for more ShowerThoughts.")
-        self.vars.utils.create_file_from_path(f"{os.getcwd()}/thoughts/")
+        self.vars.utils.create_file_from_path(os.getcwd() + os.path.sep + "/thoughts/")
         with open(self.thought_file, "w+") as thought_file:
             for thought in thoughts:
                 thought_file.write(thought + "\n")
@@ -179,20 +184,28 @@ class SBS():
         currentOS = self.getCurrentOS()
         self.utils.LOG_INFO(f"Current OS type is: '{platform.system()}.'")
         if currentOS == 0:
-            distro_name = self.vars.distro
-            distro_ver = self.vars.distro_version
-            self.utils.LOG_DEBUG(f"You are running {distro_name} v{distro_ver}.")
-            if distro_name in ["Ubuntu".lower(), "Debian".lower(), "Kali".lower(), "raspbian".lower()]:  
+            self.utils.LOG_DEBUG(f"You are running {self.utils.distro} v{self.utils.distro_version}.")
+            if self.utils.distro.lower() in ["Ubuntu".lower(), "Debian".lower(), "Kali".lower(), "Raspbian".lower()]:  
                 self.utils.create_file_from_path(
                     self.vars.out_dir
+                )
+                self.utils.create_file_from_path(
+                    self.vars.feed_dir
                 )
             else:
                 self.utils.LOG_ERROR("You are running on an unsupported Linux Distro. Please install either Debian or Ubuntu and try again.")
         elif currentOS == 1:
             self.utils.LOG_WARN("NOTE: While Windows is supported, Linux is HIGHLY recommended due to a stronger profanity filter being possible to be used.\nHowever, this program will proceed anyway...")
-            self.utils.create_file_from_path(
-                self.vars.out_dir
-            )
+            
+            if self.utils.windows_version > 10:
+                self.utils.create_file_from_path(
+                    self.vars.out_dir
+                )
+                self.utils.create_file_from_path(
+                        self.vars.feed_dir
+                )
+            else:
+                self._finish_and_exit_neatly(f"Your Windows version, v{self.utils.windows_version}, is not supported by this program.\nPlease either update your copy of Windows, run a Linux VM, or install Linux on your PC or a Raspberry Pi-like device.")
 
         elif currentOS == 2:
             self._finish_and_exit_neatly(

@@ -14,6 +14,7 @@ class SBS_vars():
         self.feed_dir = config("FEED_DIR")
         self.update_frequency = config("REFRESH_RATE")
         self.feed_link_extension = config("FEED_LINK_EXT")
+        self.web_root_dir = config("WEB_ROOT_EXT")
         
         self.uuid = uuid4()
         self.currentId = str(self.uuid)
@@ -36,11 +37,11 @@ class SBS_vars():
         self.feed_description = "This is an expiremental feed to use Amazon Polly to read the ShowerThoughts Reddit page to end users."
 
     def createEnvVars(self):
-        if os.path.isfile(f"{os.getcwd()}/.env") == False or self.utils.is_file_empty(f"{os.getcwd()}" + os.path.sep + ".env"):
-            with open(f"{os.getcwd()}/.env", "w+") as env_file:
+        if os.path.isfile(".env") == False or self.utils.is_file_empty(".env"):
+            with open(".env", "w+") as env_file:
                 self.ask_for_input(env_file)
             self.utils.LOG_DEBUG("Done writing program environment variables.")
-        elif self.utils.is_file_empty(f"{os.getcwd()}" + os.path.sep + ".env") == False or os.path.exists(f"{os.getcwd()}" + os.path.sep + ".env") == True:
+        elif self.utils.is_file_empty(".env") == False or os.path.exists(".env") == True:
             self.utils.LOG_DEBUG("'.env' file exists. Continuing...")
             
     def ask_for_input(self, env_file):
@@ -53,7 +54,7 @@ class SBS_vars():
             f"Writing '{url_input}' as the 'TTS_MAIN_URL' variable.")
         env_file.write(f"TTS_MAIN_URL={url_input}\n")
         output_dir=str(input(
-            "Where would you like the final output of the ShowerThoughts text-to-speech '.mp3' file to be stored? (example: /var/www/html/): "))
+            "Where would you like the final output of the ShowerThoughts text-to-speech '.mp3' file to be stored? (example: /var/www/html/tts-out/): "))
         if output_dir is None:
             raise Exception(
                 "Please make that the 'TTS_OUT_DIR' input is a string/path.\nRun this program to try again.")
@@ -61,7 +62,7 @@ class SBS_vars():
             f"Writing '{output_dir}' as the 'TTS_OUT_DIR' variable.")
         env_file.write(f"TTS_OUT_DIR={output_dir}\n")
         feed_dir=str(input(
-            "Where would you like the final output of the ShowerThoughts RSS '.xml' feed file to be stored? (example: /var/www/html/): "))
+            "Where would you like the final output of the ShowerThoughts RSS '.xml' feed file to be stored? (example: /var/www/html/rss/): "))
         if feed_dir is None:
             raise Exception(
                 "Please make that the 'FEED_DIR' input is a string/path.\nRun this program to try again.")
@@ -83,4 +84,12 @@ class SBS_vars():
                 "Please make that the 'FEED_LINK_EXT' input is a valid URL path that leads to the folder with the TTS files folder.\nRun this program to try again.")
         self.utils.LOG_DEBUG(
             f"Writing '{feed_link_extension}' as the 'FEED_LINK_EXT' variable.")
-        env_file.write(f"FEED_LINK_EXT={self.feed_link_extension}\n")
+        env_file.write(f"FEED_LINK_EXT={feed_link_extension}\n")
+        web_root_dir=str(input(
+            "What is the path of your webserver in which you will be hosting the ShowerThoughts TTS files and RSS feed? (example: /var/www/html/): "))
+        if web_root_dir is None:
+            raise Exception(
+                "Please make that the 'WEB_ROOT_EXT' input is a valid path that leads to the base/root folder with the files for the SBS program will be hosted.\nRun this program to try again.")
+        self.utils.LOG_DEBUG(
+            f"Writing '{web_root_dir}' as the 'WEB_ROOT_EXT' variable.")
+        env_file.write(f"WEB_ROOT_EXT={web_root_dir}\n")

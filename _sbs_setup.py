@@ -28,24 +28,27 @@ class SBS_Setup():
             f"The current date and time is: '{self.currentDate}--{self.current_time}.'\n")
 
     def main(self):
-        if self.getCurrentOS() == 0:
+        if (
+            self.getCurrentOS() == 0
+            or self.getCurrentOS() != 0
+            and self.getCurrentOS() == 1
+        ):
             self.logger.debug(
-                "Yay! You ran this program correctly, thus far.\nPrepare for unforseen consequences.")
+                "Yay! You ran this program correctly, thus far.")
             print("Yay! You ran this program correctly, thus far.")
-        elif self.getCurrentOS() == 1:
-            self._finish_and_exit_neatly(
-                "Your OS, Windows, is currently not supported. Exiting gracefully..."
-            )
-
-        elif self.getCurrentOS() == 2:
+            self.elevate_user()
+            self.install_pip(self.getCurrentOS())
+            self.install_dependencies(self.getCurrentOS())
+        elif (
+            self.getCurrentOS() != 0
+            and self.getCurrentOS() != 1
+            and self.getCurrentOS() == 2
+        ):
             self._finish_and_exit_neatly(
                 "Your OS, Darwin (AKA: macOS or Mac OS X), is currently not supported. Exiting gracefully..."
             )
-        self.elevate_user()
-        self.install_pip(self.getCurrentOS())
-        self.install_dependencies(self.getCurrentOS())
 
-    def elevate_user(self):
+    def elevate_user(self):  # sourcery skip: extract-duplicate-method
         if self.is_root == False:
             if self.getCurrentOS() == 0:  # If the user is on Linux and not running as 'root'.
                 self.logger.info(
@@ -65,42 +68,64 @@ class SBS_Setup():
                     "Your OS, Darwin (AKA: macOS or Mac OS X), is currently not supported. Exiting gracefully...\n")
 
     def install_pip(self, os_type):
+        # sourcery skip: extract-duplicate-method, extract-method, swap-if-else-branches
         if os_type == 0:
-            command = "pip --version"
-            process = subprocess.Popen(
-                command, shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            answer = self.yes_no(
-                "Does this program have your permission to install Python3's pip module? (Y/N): ")
-            if process.returncode != 0 and answer == True:
-                command = "sudo apt install -y python3-pip"
+            try:
+                command = "pip3 --version"
                 process = subprocess.Popen(
                     command, shell=True, stdout=subprocess.PIPE)
                 process.wait()
                 if process.returncode != 0:
-                        print(
-                            f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
-        elif os_type == 1:
-            try:
-                command = "pip --version"
-                process = subprocess.Popen(
-                    command, shell=True, stdout=subprocess.PIPE)
-                process.wait()
-                answer = self.yes_no(
-                    "Does this program have your permission to install Python3.8.10 using Microsoft WinGet? (Y/N): ")
-                if process.returncode != 0 and answer == True:
-                    command = "winget install --id Python.Python.3 --version 3.8.10150.0"
+                    print("Python's PIP is not installed. Installing...")
+                    self.logger.debug("Python's PIP is not installed. Installing...")
+                    command = "sudo apt install -y python3-pip"
                     process = subprocess.Popen(
-                        command, shell=True, stdout=subprocess.PIPE)
+                        command, shell=True)
                     process.wait()
                     if process.returncode != 0:
                         print(
                             f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+                    else:
+                        print(f"Completed installation of Python with code '{process.returncode}'.")
+                        self.logger.debug(f"Completed installation of Python with code '{process.returncode}'.")
+                else:
+                    print(f"Completed installation of Python with code '{process.returncode}'.")
+                    self.logger.debug(f"Completed installation of Python with code '{process.returncode}'.")
+            except Exception as error:
+                self.logger.error("Uh... Houston, we have a problem.")
+                print(
+                "Uh... Houston, we have a problem.\nThis program will likely crash in the near future.")
+        elif os_type == 1:
+            try:
+                command = "pip3 --version"
+                process = subprocess.Popen(
+                    command, shell=True, stdout=subprocess.PIPE)
+                process.wait()
+                if process.returncode != 0:
+                    print("Python's PIP is not installed. Installing...")
+                    self.logger.debug("Python's PIP is not installed. Installing...")
+                    command = "winget install --id Python.Python.3 --version 3.8.10150.0"
+                    process = subprocess.Popen(
+                        command, shell=True)
+                    process.wait()
+                    if process.returncode != 0:
+                        print(
+                            f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+                    else:
+                        print(f"Completed installation of Python with code '{process.returncode}'.")
+                        self.logger.debug(f"Completed installation of Python with code '{process.returncode}'.")      
+                else:
+                    print(f"Completed installation of Python 3 PIP with code '{process.returncode}'.")
+                    self.logger.debug(f"Completed installation of Python 3 PIP with code '{process.returncode}'.")
             except Exception as error:
                 self.logger.fatal(
-                    f"There was a fatal error that occured. Here is the stack trace:\n{error}")
+                    f'There was a fatal error that occured. Here is the stack trace:\n{error}'
+                )
+
                 self._finish_and_exit_neatly(
-                    "Uh oh, Daisy Oh!\nPlease check the 'sbs-setup.log'. A fatal error occured...")
+                    "Uh oh, Daisy Oh!\nPlease check the 'sbs-setup.log'. A fatal error occured..."
+                )
+
         else:
             self.logger.error("Uh... Houston, we have a problem.")
             print(
@@ -108,31 +133,32 @@ class SBS_Setup():
 
     def install_dependencies(self, os_type):
         if os_type == 0:
+            if self.is_root == False:
+                return # Cancel out as all below code for Linux needs to have the 'sudo' command added to this python file when executed.
             command = "sudo apt install -y libhunspell-dev"
-            process = subprocess.Popen(
-                command, shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            if process.returncode != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+            exec = os.system(command)
+            if exec != 0:
+                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
             command = "sudo pip install -r " + os.getcwd() + os.path.sep + "requirements_linux.txt"
-            process = subprocess.Popen(
-                command, shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            if process.returncode != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+            exec = os.system(command)
+            if exec != 0:
+                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
+            command = "sudo spacy download en_core_web_sm"
+            exec = os.system(command)
+            if exec != 0:
+                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
         elif os_type == 1:
             command = "pip install -r " + os.getcwd() + os.path.sep +"requirements_windows.txt"
-            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            if process.returncode != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+            exec = os.system(command)
+            if exec != 0:
+                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
     
     def yes_no(self, input_question):
         prompt = str(input(input_question))
         
-        if prompt in ["Y".lower(), "YES".lower()]:
+        if prompt.lower() in ["Y".lower(), "YES".lower()]:
             return True
-        elif prompt in ["N".lower(), "NO".lower()]:
+        elif prompt.lower() in ["N".lower(), "NO".lower()]:
             return False
         else:
             self.yes_no(input_question)
