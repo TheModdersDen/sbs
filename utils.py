@@ -103,7 +103,7 @@ class Utils():
         self.logger.info(f"INFO: {MSG}")
         print(f"INFO: {MSG}")
 
-    # Log an ERROR message.
+    # Log an ERROR message
     def LOG_ERROR(self, MSG):
         self.logger.error(f"ERROR: {MSG}")
         print(f"ERROR: {MSG}")

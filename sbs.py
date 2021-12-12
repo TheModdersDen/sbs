@@ -41,9 +41,9 @@ class SBS():
 
         # Define some local variables and point them to the ones in the variables file.
         main_url = vars.main_url
-        out_dir = vars.out_dir
+        out_dir = vars.tts_out_dir
         out_file = vars.out_file
-        feed_dir = vars.feed_dir
+        feed_dir = vars.rss_out_dir
         update_frequency = vars.update_frequency
 
     # Check to see if a certain word, phrase, or even paragraph is profane. 
@@ -151,7 +151,7 @@ class SBS():
         os.system(cleanup_command)
         self.vars.utils.LOG_DEBUG("Running command: '" + cleanup_command + "'")
 
-        move_command = f"mv polly_output{self.vars.currentId}.mp3 {self.vars.out_dir}"
+        move_command = f"mv polly_output{self.vars.currentId}.mp3 {self.vars.tts_out_dir}"
         self.vars.utils.LOG_DEBUG("Running command: '" + move_command + "'")
         os.system(move_command)
 
@@ -165,7 +165,7 @@ class SBS():
             language="en")
 
         tts_filesize = self.vars.utils.get_file_size(
-            self.vars.out_dir + self.vars.out_file)
+            self.vars.tts_out_dir + self.vars.out_file)
 
         test_feed.add_item(
             unique_id=self.vars.URN_UUID,
@@ -177,30 +177,29 @@ class SBS():
                                 str(tts_filesize), "audio/mpeg")
         )
 
-        with codecs.open(f"{self.vars.feed_dir}st-test.xml", "w", encoding=self.vars.encoding_type) as rss_feed:
+        with codecs.open(f"{self.vars.rss_out_dir}st-test.xml", "w", encoding=self.vars.encoding_type) as rss_feed:
             rss_feed.truncate()
             rss_feed.write(test_feed.writeString(self.vars.encoding_type))
             rss_feed.close()
 
     # The main function.
     def main(self):
-        version_URL = urllib.request.urlopen(f"{self.vars.main_url}ST_VERSION")
-        self.vars.utils.LOG_DEBUG(
-            f'result code for version_URL: {version_URL.getcode()}'.strip("\n")
-        )
-
-        data = version_URL.read()
-        print(f"Starting SBS v{data}... Please wait.")
+        version_URL = urllib.request.Request(f"{self.vars.version_check_url}ST_VERSION")
+        with urllib.request.urlopen(version_URL) as response:
+            page_data = response.read()
+            sbs_ver = page_data.decode()
+            sbs_ver = sbs_ver.strip("\n")
+        self.utils.LOG_INFO(f"Starting SBS v{sbs_ver}... Please wait.")
         currentOS = self.getCurrentOS()
         self.utils.LOG_INFO(f"Current OS type is: '{platform.system()}.'")
         if currentOS == 0:
             self.utils.LOG_DEBUG(f"You are running {self.utils.distro} v{self.utils.distro_version}.")
             if self.utils.distro.lower() in ["Ubuntu".lower(), "Debian".lower(), "Kali".lower(), "Raspbian".lower()]:  
                 self.utils.create_file_from_path(
-                    self.vars.out_dir
+                    self.vars.tts_out_dir
                 )
                 self.utils.create_file_from_path(
-                    self.vars.feed_dir
+                    self.vars.rss_out_dir
                 )
             else:
                 self.utils.LOG_ERROR("You are running on an unsupported Linux Distro. Please install either Debian or Ubuntu and try again.")
@@ -209,10 +208,10 @@ class SBS():
             
             if self.utils.windows_version > 10:
                 self.utils.create_file_from_path(
-                    self.vars.out_dir
+                    self.vars.tts_out_dir
                 )
                 self.utils.create_file_from_path(
-                        self.vars.feed_dir
+                        self.vars.rss_out_dir
                 )
             else:
                 self._finish_and_exit_neatly(f"Your Windows version, v{self.utils.windows_version}, is not supported by this program.\nPlease either update your copy of Windows, run a Linux VM, or install Linux on your PC or a Raspberry Pi-like device.")
