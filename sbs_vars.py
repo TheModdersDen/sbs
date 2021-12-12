@@ -49,7 +49,7 @@ class SBS_vars():
             f"The current date and time is: '{self.currentDate}--{self.current_time}.'")
         self.out_file = f"polly_output{self.currentId}.mp3"
         self.feed_title = f"Your ShowerThoughts Update ({self.currentDate}--{self.current_time})"
-        self.feed_link = self.rss_main_url + f"polly_output{self.currentId}.mp3"
+        self.feed_link = self.tts_main_url + f"polly_output{self.currentId}.mp3"
 
         self.feed_description = "This is an expiremental feed to use Amazon Polly to read the ShowerThoughts Reddit page to end users."
 
