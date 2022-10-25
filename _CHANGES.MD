@@ -1,5 +1,11 @@
 # SBS CHANGELOG
 
+## 0.0.1
+
+- Fixed some MAJOR bugs
+
+- Begun work on migrating servers, again
+
 ## 0.0.0.5
 
 - Add credit to the post author while Alexa speaks out the thought.

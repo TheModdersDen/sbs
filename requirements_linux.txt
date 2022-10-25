@@ -7,6 +7,6 @@ pytest==6.2.5
 elevate==0.1.3
 requests==2.26.0
 python-dotenv==0.19.2
-git+https://github.com/TheModdersDen/profanity-filter2#egg=profanity-filter2[deep-analysis]
+profanity-filter2[deep-analysis]
 git+https://github.com/rominf/hunspell_serializable@49c00fabf94cacf9e6a23a0cd666aac10cb1d491#egg=hunspell_serializable
 git+https://github.com/rominf/pyffs@6c805fbfd7771727138b169b32484b53c0b0fad1#egg=pyffs

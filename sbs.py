@@ -184,12 +184,12 @@ class SBS():
 
     # The main function.
     def main(self):
-        version_URL = urllib.request.Request(f"{self.vars.version_check_url}ST_VERSION")
-        with urllib.request.urlopen(version_URL) as response:
-            page_data = response.read()
-            sbs_ver = page_data.decode()
-            sbs_ver = sbs_ver.strip("\n")
-        self.utils.LOG_INFO(f"Starting SBS v{sbs_ver}... Please wait.")
+        #version_URL = urllib.request.Request(f"{self.vars.version_check_url}ST_VERSION")
+        #with urllib.request.urlopen(version_URL) as response:
+            #page_data = response.read()
+            #sbs_ver = page_data.decode()
+            #sbs_ver = sbs_ver.strip("\n")
+        #self.utils.LOG_INFO(f"Starting SBS v{sbs_ver}... Please wait.")
         currentOS = self.getCurrentOS()
         self.utils.LOG_INFO(f"Current OS type is: '{platform.system()}.'")
         if currentOS == 0:
