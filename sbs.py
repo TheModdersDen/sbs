@@ -130,7 +130,7 @@ class SBS():
 
     # Create a text-to-speech file.
     def create_tts_file(self, data, out_dir_var,  out_file_name):
-        polly_command = f'cd {out_dir_var} && sudo aws polly synthesize-speech --text-type ssml --output-format "mp3" --voice-id "Salli" --engine neural --text "<speak>{data}<break time= \\"1s\\"/></speak>" {out_file_name}'
+        polly_command = f'cd {out_dir_var} && sudo aws polly synthesize-speech --text-type ssml --output-format "mp3" --voice-id "Joanna" --engine neural --text "<speak><amazon:domain name="news">{data}<break time= \\"1s\\"/></amazon:domain></speak>" {out_file_name}'
         print(polly_command)
         os.system(polly_command)
 
