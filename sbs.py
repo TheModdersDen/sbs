@@ -70,7 +70,7 @@ class SBS():
         pf.extra_profane_word_dictionaries={"en_core_web_sm": set(self.badwords_list)}
 
         return (
-        predict_prob([input]) >= [0.1]
+        predict_prob([input]) >= [0.5]
         or predict([input]) == [1]
         or word.lower() in [input]
         or pf.is_profane(input)
