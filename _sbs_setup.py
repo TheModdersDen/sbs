@@ -52,16 +52,16 @@ class SBS_Setup():
         if self.is_root == False:
             if self.getCurrentOS() == 0:  # If the user is on Linux and not running as 'root'.
                 self.logger.info(
-                    "User is not currently running the program as root. Requesting root privledges... NOW.")
+                    "User is not currently running the program as root. Requesting root privileges... NOW.")
                 print(
-                    "User is not currently running the program as root. Requesting root privledges... NOW.\n")
+                    "User is not currently running the program as root. Requesting root privileges... NOW.\n")
                 elevate()
             # If the user is on Windows and not running as 'Administrator'.
             elif self.getCurrentOS() == 1:
                 self.logger.info(
-                    "User is not currently running the program as 'Administrator'. Requesting admin privledges... NOW.")
+                    "User is not currently running the program as 'Administrator'. Requesting admin privileges... NOW.")
                 print(
-                    "User is not currently running the program as 'Administrator'. Requesting admin privledges... NOW.\n")
+                    "User is not currently running the program as 'Administrator'. Requesting admin privileges... NOW.\n")
                 elevate()
             elif self.getCurrentOS() == 2:  # If the user is on Darwin/macOS.
                 self._finish_and_exit_neatly(
@@ -84,7 +84,7 @@ class SBS_Setup():
                     process.wait()
                     if process.returncode != 0:
                         print(
-                            f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+                            f"An error occurred while running command '{command}'.\n The error code is: '{process.returncode}'.")
                     else:
                         print(f"Completed installation of Python with code '{process.returncode}'.")
                         self.logger.debug(f"Completed installation of Python with code '{process.returncode}'.")
@@ -110,7 +110,7 @@ class SBS_Setup():
                     process.wait()
                     if process.returncode != 0:
                         print(
-                            f"An error occured while running command '{command}'.\n The error code is: '{process.returncode}'.")
+                            f"An error occurred while running command '{command}'.\n The error code is: '{process.returncode}'.")
                     else:
                         print(f"Completed installation of Python with code '{process.returncode}'.")
                         self.logger.debug(f"Completed installation of Python with code '{process.returncode}'.")      
@@ -119,11 +119,11 @@ class SBS_Setup():
                     self.logger.debug(f"Completed installation of Python 3 PIP with code '{process.returncode}'.")
             except Exception as error:
                 self.logger.fatal(
-                    f'There was a fatal error that occured. Here is the stack trace:\n{error}'
+                    f'There was a fatal error that occurred. Here is the stack trace:\n{error}'
                 )
 
                 self._finish_and_exit_neatly(
-                    "Uh oh, Daisy Oh!\nPlease check the 'sbs-setup.log'. A fatal error occured..."
+                    "Uh oh, Daisy Oh!\nPlease check the 'sbs-setup.log'. A fatal error occurred..."
                 )
 
         else:
@@ -138,20 +138,20 @@ class SBS_Setup():
             command = "sudo apt install -y libhunspell-dev"
             exec = os.system(command)
             if exec != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
+                print(f"An error occurred while running command '{command}'.\n The error code is: '{exec}'.")
             command = "sudo pip install -r " + os.getcwd() + os.path.sep + "requirements_linux.txt"
             exec = os.system(command)
             if exec != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
+                print(f"An error occurred while running command '{command}'.\n The error code is: '{exec}'.")
             command = "sudo spacy download en_core_web_sm"
             exec = os.system(command)
             if exec != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
+                print(f"An error occurred while running command '{command}'.\n The error code is: '{exec}'.")
         elif os_type == 1:
             command = "pip install -r " + os.getcwd() + os.path.sep +"requirements_windows.txt"
             exec = os.system(command)
             if exec != 0:
-                print(f"An error occured while running command '{command}'.\n The error code is: '{exec}'.")
+                print(f"An error occurred while running command '{command}'.\n The error code is: '{exec}'.")
     
     def yes_no(self, input_question):
         prompt = str(input(input_question))

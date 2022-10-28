@@ -6,7 +6,7 @@ import platform
 class Utils():
 
     logger = None
-    
+
     # If on Linux, get the distribution name.
     def get_distro_name(self):  # sourcery skip: class-extract-method
 
@@ -25,10 +25,11 @@ class Utils():
             version_split = RELEASE_DATA["VERSION"].split(" ", maxsplit=1)
             if version_split[0] == major_version:
                 # Just major version shown, replace it with the full version
-                RELEASE_DATA["VERSION"] = " ".join([DEBIAN_VERSION] + version_split[1:])
+                RELEASE_DATA["VERSION"] = " ".join(
+                    [DEBIAN_VERSION] + version_split[1:])
 
         return "{}".format(RELEASE_DATA["NAME"])
-    
+
     # If on Linux, get the distribution version.
     def get_distro_version(self):
 
@@ -47,10 +48,11 @@ class Utils():
             version_split = RELEASE_DATA["VERSION"].split(" ", maxsplit=1)
             if version_split[0] == major_version:
                 # Just major version shown, replace it with the full version
-                RELEASE_DATA["VERSION"] = " ".join([DEBIAN_VERSION] + version_split[1:])
+                RELEASE_DATA["VERSION"] = " ".join(
+                    [DEBIAN_VERSION] + version_split[1:])
 
         return "{}".format(RELEASE_DATA["VERSION"])
-    
+
     # Create a file from a filepath, if it doesn't exist.
     def create_file_from_path(self, file_path):
         if not os.path.exists(os.path.dirname(file_path)):

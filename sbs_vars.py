@@ -85,7 +85,7 @@ class SBS_vars():
             "What is the URL where the text-to-speech files will be stored? (example: 'https://example.com/st/tts/', w/o quotes): "))
         if output_dir is None:
             raise Exception(
-                "Please make that the 'TTS_MAIN_URL' input is a valid URL without quotes.\nRun this program to try again.")
+                "Please make sure that the 'TTS_MAIN_URL' input is a valid URL without quotes.\nRun this program to try again.")
         self.utils.LOG_DEBUG(
             f"Writing '{output_dir}' as the 'TTS_MAIN_URL' variable.")
         env_file.write(f"TTS_MAIN_URL={output_dir}\n")
@@ -93,22 +93,22 @@ class SBS_vars():
             "What is the URL path where the RSS feed will be stored (not the direct path to the RSS feed)?: "))
         if feed_dir is None:
             raise Exception(
-                "Please make that the 'RSS_MAIN_URL' input is a valid URL without quotes.\nRun this program to try again.")
+                "Please make sure that the 'RSS_MAIN_URL' input is a valid URL without quotes.\nRun this program to try again.")
         self.utils.LOG_DEBUG(
             f"Writing '{feed_dir}' as the 'RSS_MAIN_URL' variable.")
         env_file.write(f"RSS_MAIN_URL={feed_dir}\n")
         refresh_rate=str(input(
-            "How often would you like the feed to be updated? NOTE: The more the feed is updated, the more strain will be put on your system (day/hour): "))
-        if refresh_rate not in {"hour", "day"}:
+            "How often would you like the feed to be updated? NOTE: The more the feed is updated, the more strain will be put on your system (week/day/hour): "))
+        if refresh_rate not in {"hour", "day", "week"}:
             raise Exception(
-                "Please make that the 'REFRESH_RATE' input is set to either 'day' or 'hour'.\nRun this program to try again.")
+                "Please make sure that the 'REFRESH_RATE' input is set to 'week', 'day', or 'hour'.\nRun this program to try again.")
         self.utils.LOG_DEBUG(
             f"Writing '{refresh_rate}' as the 'REFRESH_RATE' variable.")
         env_file.write(f"REFRESH_RATE={refresh_rate}\n")
         version_url = str(input("What is the URL path that this program should check for a version from (example: https://example.com/st/)?: "))
         if version_url is None:
             raise Exception(
-                "Please make that the 'VERSION_URL' input is set to a valid URL.\nRun this program to try again.")
+                "Please make sure that the 'VERSION_URL' input is set to a valid URL.\nRun this program to try again.")
         self.utils.LOG_DEBUG(
             f"Writing '{version_url}' as the 'VERSION_URL' variable.")
         env_file.write(f"VERSION_URL={version_url}\n")

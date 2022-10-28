@@ -232,8 +232,3 @@ class SBS():
         self.utils.LOG_ERROR(message)
         sleep(5)
         exit(1) # Generic exit error.
-
-
-if __name__ == "__main__":
-    sbs = SBS()
-    sbs.main()
