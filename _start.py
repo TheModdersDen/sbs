@@ -9,7 +9,7 @@ from time import sleep
 from rich.console import Console
 import argparse
 
-from sbs import SBS
+from sbs_old import SBS
 from sbs_vars import SBS_vars
 
 class SBS_Start():

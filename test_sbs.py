@@ -3,7 +3,7 @@ import pytest
 import os
 import glob
 
-from sbs import SBS
+from sbs_old import SBS
 
 # Check to see if the profanity filter is working with the current wordset.
 def test_isProfane():
