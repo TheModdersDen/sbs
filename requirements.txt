@@ -9,4 +9,4 @@ python-dotenv>=0.19.2
 rich>=12.6.0
 boto3>=1.26.151
 # Linux only
-# hunspell
+hunspell
