@@ -21,14 +21,17 @@
 
 # A utility class for the ShowerThoughts Briefing Skill to handle OS specific functions
 from platform import platform, system, architecture, release, version, machine, node, processor, python_implementation, python_version, uname, mac_ver, win32_ver, libc_ver
-
 from os.path import isfile, isdir, join, exists
 
+import distro
+
+from sbs import SBS
 
 class OSUtils():
 
     def __main__(self) -> object:
         # OS specific variables
+        self.sbs = SBS()
         self._os = system()
         self._system = platform()
         self._arch = architecture()
@@ -41,7 +44,7 @@ class OSUtils():
         if self._os == 'Windows':
             self._win_ver = win32_ver()
         elif self._os == 'Linux':
-            self._linux_dist = linux_distribution()
+            self._linux_dist = distro.linux_distribution()
         elif self._os == 'Darwin':
             self._mac_ver = mac_ver()
         self._libc_ver = libc_ver()
@@ -68,28 +71,36 @@ class OSUtils():
 
     def get_external_ip_address(self) -> str:
         from requests import get
-        return get('https://api.ipify.org').content.decode('utf8')
+        try:
+            return get('https://api.ipify.org').content.decode('utf8')
+        except Exception as e:
+            self.sbs.logger.error("An error occurred when trying to resolve an IP address. Error Info:\n"+ e)
+            return None
 
     # Get a list of open ports on the machine or network:
-    def get_open_ports(self):
-        import subprocess
-        
-        open_ports = []
-        if self._os != 'Linux':
-            raise NotImplementedError
-        
-        subprocess.call('netstat -an > netstat.txt', shell=True)
-        
-        with open('netstat.txt', 'r') as netstat:
-            for line in netstat:
-                if 'LISTEN' in line:
-                    open_ports.append(line.split()[3].split(':')[1])
-                else:
-                    continue
-        return open_ports
+    def get_open_ports(self) -> list:
+        try:
+            import subprocess
+            
+            open_ports = []
+            if self._os != 'Linux':
+                raise NotImplementedError
+            
+            subprocess.call('netstat -an > netstat.txt', shell=True)
+            
+            with open('netstat.txt', 'r') as netstat:
+                for line in netstat:
+                    if 'LISTEN' in line:
+                        open_ports.append(line.split()[3].split(':')[1])
+                    else:
+                        continue
+            return open_ports
+        except Exception as e:
+            self.sbs.logger.error("An error occurred when trying to resolve open ports. Error Info:\n"+ e)
+            return None
 
     # Get the hostname of the machine:
-    def get_hostname(self):
+    def get_hostname(self) -> str:
         return self._node
 
     # Get the current webserver in use on the machine:
