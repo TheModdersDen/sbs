@@ -8,5 +8,6 @@ requests>=2.31.0
 python-dotenv>=0.19.2
 rich>=12.6.0
 boto3>=1.26.151
-# Linux only
+git+https://github.com/RobertKnaus/profanity-filter@89fe2ad8c09c0743a553d7019dc9863e555a0afa#egg=profanity-filter[deep-analysis]
+# Linux only (comment out for Windows or Mac)
 hunspell
