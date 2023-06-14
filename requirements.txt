@@ -12,3 +12,5 @@ git+https://github.com/RobertKnaus/profanity-filter@89fe2ad8c09c0743a553d7019dc9
 # Linux only below (comment out for Windows or Mac)
 hunspell
 distro>=1.8.0
+ntplib>=0.4.0
+psutil==5.9.5
