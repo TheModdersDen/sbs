@@ -65,6 +65,3 @@ class SBSProfanityFilter():
         with open(getcwd() + f"{pathsep}data{pathsep}badwords.txt", "r") as f:
             self.badwords = f.read().splitlines()
         
-        
-        
-        

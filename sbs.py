@@ -97,4 +97,3 @@ class SBS(object):
         self.args = self.arg_parser.parse_args()
         
         return self.args
-    

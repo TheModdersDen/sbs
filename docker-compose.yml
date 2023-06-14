@@ -1,0 +1,28 @@
+# A Docker Compose file to start the application
+services:
+  sbs-skill:
+    volumes:
+      - .:/opt/sbs-skill
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - REFRESH_RATE=day
+      - OUTPUT_DIR=/var/www/html/st/
+      - OUTPUT_FILE=st_$REFRESH_RATE.json
+      - OUTPUT_FILE_PATH=$OUTPUT_DIR$OUTPUT_FILE
+      - CRON_SCHEDULE=0 0 * * *
+      - CRON_COMMAND=python3 sbs.py
+      - CRON_LOG=/var/log/cron.log
+      - CRON_USER=root
+      - CRON_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/sbs-skill:$PATH
+      - CRON_WORKING_DIR=/opt/sbs-skill
+      - CRON_SHELL=/bin/bash
+      - CRON_SHELL_OPT=-c
+      - CRON_SHELL_CMD=$CRON_SHELL $CRON_SHELL_OPT "$CRON_COMMAND"
+      - CRON_ENTRY=$CRON_SCHEDULE $CRON_USER $CRON_SHELL_CMD
+      - CRON_ENTRY_FILE=/etc/cron.d/sbs-skill
+    image: "python:3.10.2-slim"
+    working_dir: /opt/sbs-skill
+    command: bash -c "pip install -r requirements.txt; python3 sbs.py"
+    entrypoint: bash -c "echo $CRON_ENTRY > $CRON_ENTRY_FILE; crontab $CRON_ENTRY_FILE; cron && tail -f $CRON_LOG"
