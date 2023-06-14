@@ -5,10 +5,18 @@
     },
     "python.formatting.provider": "none",
     "cSpell.words": [
+        "Alexa",
         "badwords",
+        "boto",
         "dateutil",
+        "gethostname",
+        "getpid",
         "gmtime",
+        "indev",
+        "lighttpd",
         "nlps",
-        "ntplib"
+        "ntplib",
+        "outro",
+        "webserver"
     ]
 }
