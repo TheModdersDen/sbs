@@ -134,3 +134,6 @@ dmypy.json
 thoughts/
 logs/
 VARS_SET
+
+# Logs
+logs/*
