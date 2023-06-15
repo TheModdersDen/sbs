@@ -4,11 +4,12 @@
   },
   "python.formatting.provider": "none",
   "cSpell.words": [
+    "autopep8",
+    "badwords",
     "gethostname",
     "gmtime",
     "lighttpd",
-    "webserver",
-    "autopep8"
+    "webserver"
   ],
   "cSpell.language": "en-US",
   "autopep8.formatOnSave": true,

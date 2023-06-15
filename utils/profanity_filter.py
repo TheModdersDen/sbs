@@ -19,7 +19,6 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
-import logging
 from os import getcwd
 from os.path import pathsep
 
@@ -56,7 +55,7 @@ class SBSProfanityFilter():
             self.extra_filter_words = extra_filter_words  # Extra words to filter out
         self.censor = censor  # Should the words be censored or removed?
 
-        self.nlp = spacy.load('en')
+        self.nlp = spacy.load('en_core_web_sm')
         self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
                                   censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
 

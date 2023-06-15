@@ -66,11 +66,20 @@ class SBS(object):
 
         # Load the environment variables
         load_dotenv()
-
+        self.args = self.handle_cmdline()
         # Initialize the variables
-        self.extra_profanity_words = []
-        self.profanity_filter = ProfanityFilter(
-            self.extra_profanity_words, False)
+        self.extra_profanity_words = None
+        if self.args.profanity is True:
+            try:
+                with open(getcwd() + f"data{pathsep}badwords.txt", "r") as f:
+                    self.extra_profanity_words = f.read().splitlines()
+                self.profanity_filter = ProfanityFilter(
+                    self.extra_profanity_words, False)
+            except Exception as e:
+                self.logger.error(f"Error loading extra profanity words: {e}")
+        if self.args.profanity is False:
+            self.extra_profanity_words = []
+
         self.feed_utils = FeedUtils()
         self.os_utils = OSUtils()
         self.env_vars = []
@@ -80,7 +89,6 @@ class SBS(object):
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
 
-        self.handle_cmdline()
         self.feed_utils.parse_feed()
 
     def handle_cmdline(self) -> Namespace:
@@ -93,15 +101,13 @@ class SBS(object):
         self.arg_parser.add_argument('-p', '--profanity', help='Filter out profanity?',
                                      required=True, action='store_true', default=False, dest='profanity', type=bool)
         self.arg_parser.add_argument('-c', '--censor', help='Censor the profanity?',
-                                     required=False, action='store_true', default=False, dest='censor', type=bool)
+                                     required=False, action='store_true', default=True, dest='censor', type=bool)
         self.arg_parser.add_argument(
             '-x', '--extra', help='Extra profanity word file to filter out profanity with', required=False, dest='extra', type=str)
         self.arg_parser.add_argument('-d', '--debug', help='Debug mode?', required=False,
                                      action='store_true', default=False, dest='debug', type=bool)
         self.arg_parser.add_argument('-e', '--experimental', help='Experimental mode?',
                                      required=False, action='store_true', default=False, dest='experimental', type=bool)
-        self.arg_parser.add_argument('-v', '--version', help='Show the version and exit',
-                                     required=False, action='store_true', default=False, dest='version', type=bool)
         self.arg_parser.add_argument('-f', '--feed', help='Save the thoughts to a RSS feed?',
                                      required=False, action='store_true', default=False, dest='feed', type=bool)
         self.arg_parser.add_argument('-s', '--save', help='Save the thoughts to a text file?',
