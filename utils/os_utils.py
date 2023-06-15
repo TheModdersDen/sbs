@@ -19,13 +19,16 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
+from os.path import exists, isdir, isfile, join
 # A utility class for the ShowerThoughts Briefing Skill to handle OS specific functions
-from platform import platform, system, architecture, release, version, machine, node, processor, python_implementation, python_version, uname, mac_ver, win32_ver, libc_ver
-from os.path import isfile, isdir, join, exists
+from platform import (architecture, libc_ver, mac_ver, machine, node, platform,
+                      processor, python_implementation, python_version,
+                      release, system, uname, version, win32_ver)
 
 import distro
 
 from sbs import SBS
+
 
 class OSUtils():
 

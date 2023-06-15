@@ -19,22 +19,25 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
+from datetime import datetime, timedelta
+from os import getpid
+from time import gmtime, sleep, strftime, time
+
+from elevate import elevate
+from psutil import Process
+
 #! Process related utilities
 from sbs import SBS
-from os import getpid
-from psutil import Process
-from datetime import datetime, timedelta
-from time import sleep, time, strftime, gmtime
-from elevate import elevate
+
 
 class ProcUtils():
-    
+
     def __main__(self):
         self.sbs = SBS()
         self.logger = self.sbs.logger
-        
+
         self.logger.debug('Proc Utils initializing...')
-        
+
     # Get the current process ID
     def get_process_id(self) -> int:
         try:
@@ -45,7 +48,7 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting process ID: {e}')
             return None
-    
+
     # Get the current process
     def get_current_process(self) -> Process:
         try:
@@ -57,7 +60,7 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting current process: {e}')
             return None
-    
+
     # Get the current process CPU usage
     def get_process_cpu_usage(self) -> float:
         try:
@@ -69,7 +72,7 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting process CPU usage: {e}')
             return None
-    
+
     # Get the current process memory usage
     def get_process_memory_usage(self) -> float:
         try:
@@ -80,20 +83,22 @@ class ProcUtils():
             return mem_usage
         except Exception as e:
             self.logger.error(f'Error getting process memory usage: {e}')
-            return None  
-    
+            return None
+
     # Get the current process CPU and memory usage
     def get_cpu_and_memory_usage(self) -> tuple:
         try:
             self.logger.debug('Getting process CPU and memory usage...')
             cpu_usage = self.get_process_cpu_usage()
             mem_usage = self.get_process_memory_usage()
-            self.logger.debug(f'Got process CPU and memory usage: {cpu_usage}, {mem_usage}')
+            self.logger.debug(
+                f'Got process CPU and memory usage: {cpu_usage}, {mem_usage}')
             return (cpu_usage, mem_usage)
         except Exception as e:
-            self.logger.error(f'Error getting process CPU and memory usage: {e}')
+            self.logger.error(
+                f'Error getting process CPU and memory usage: {e}')
             return None
-        
+
     # Get the process file location
     def get_process_file_location(self) -> str:
         try:
@@ -105,7 +110,7 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting process file location: {e}')
             return None
-    
+
     # Get the process file name
     def get_process_file_name(self) -> str:
         try:
@@ -117,8 +122,8 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting process file name: {e}')
             return None
-       
-    # Get how long the process has been running  
+
+    # Get how long the process has been running
     def get_process_uptime(self) -> timedelta:
         try:
             self.logger.debug('Getting process uptime...')
@@ -129,7 +134,7 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error getting process uptime: {e}')
             return None
-    
+
     # Check to see if the process is running
     def is_process_running(self) -> bool:
         try:
@@ -141,41 +146,50 @@ class ProcUtils():
         except Exception as e:
             self.logger.error(f'Error checking if process is running: {e}')
             return None
-    
+
     # Check to see if the process is running as root/superuser/admin
     def is_elevated(self) -> bool:
         try:
-            self.logger.debug('Checking if process is running as root/superuser/admin...')
+            self.logger.debug(
+                'Checking if process is running as root/superuser/admin...')
             is_elevated = elevate.is_root()
-            self.logger.debug(f'Process with pid of {getpid()} is running as root/superuser/admin: {is_elevated}')
+            self.logger.debug(
+                f'Process with pid of {getpid()} is running as root/superuser/admin: {is_elevated}')
             return is_elevated
         except Exception as e:
-            self.logger.error(f'Error checking if process is running as root/superuser/admin: {e}')
+            self.logger.error(
+                f'Error checking if process is running as root/superuser/admin: {e}')
             return None
-        
+
     # Elevate the process to root/superuser/admin
     def elevate(self) -> bool:
         if self.is_elevated():
-            self.logger.debug('Process is already running as root/superuser/admin, skipping...')
+            self.logger.debug(
+                'Process is already running as root/superuser/admin, skipping...')
             return True
         else:
             try:
-                self.logger.debug('Elevating process to root/superuser/admin...')
+                self.logger.debug(
+                    'Elevating process to root/superuser/admin...')
                 elevate()
                 self.logger.debug('Process elevated to root/superuser/admin')
                 return True
             except Exception as e:
-                self.logger.error(f'Error elevating process to root/superuser/admin: {e}')
+                self.logger.error(
+                    f'Error elevating process to root/superuser/admin: {e}')
                 return False
-            
+
     # Get the process uptime in a human readable format
     def get_readable_uptime(self) -> str:
         try:
-            self.logger.debug('Getting process uptime in a human readable format...')
+            self.logger.debug(
+                'Getting process uptime in a human readable format...')
             uptime = self.get_process_uptime()
             readable_uptime = strftime('%H:%M:%S', gmtime(uptime))
-            self.logger.debug(f'Got process uptime in a human readable format: {readable_uptime}')
+            self.logger.debug(
+                f'Got process uptime in a human readable format: {readable_uptime}')
             return readable_uptime
         except Exception as e:
-            self.logger.error(f'Error getting process uptime in a human readable format: {e}')
+            self.logger.error(
+                f'Error getting process uptime in a human readable format: {e}')
             return None

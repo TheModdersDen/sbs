@@ -19,24 +19,25 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
-from feedgenerator import Rss201rev2Feed, Enclosure
-from feedparser import parse
-from os import getcwd, pathsep
 import io
-from time import sleep, time, strftime, gmtime
+from os import getcwd, pathsep
+from time import gmtime, sleep, strftime, time
+
+from feedgenerator import Enclosure, Rss201rev2Feed
+from feedparser import parse
 
 from sbs import SBS
 
+
 # A class to handle the feed generation for the ShowerThoughts Briefing Skill
 class FeedUtils():
-    
+
     def __main__(self) -> object:
         self.sbs = SBS()
-        
+
         self.sbs.logger.debug('Feed Utils initializing...')
-        
+
         self.sbs.logger.debug('Feed Utils initialized')
-        
-        
+
     def parse_feed(self, feed_url: str) -> object:
         pass
