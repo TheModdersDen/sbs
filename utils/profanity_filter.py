@@ -31,7 +31,8 @@ from sbs import SBS
 class SBSProfanityFilter():
 
     def __main__(self, extra_filter_words=[], censor=False, log_profanity_filter=False) -> object:
-
+        # TODO: Reorganize some of this code
+        # TODO!!!: Add support for Windows and Mac
         self.sbs = SBS()
         self.os_utils = OSUtils()
 
