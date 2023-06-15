@@ -6,9 +6,15 @@
   "cSpell.words": [
     "autopep8",
     "badwords",
+    "boto",
+    "dateutil",
     "gethostname",
+    "getpid",
     "gmtime",
     "lighttpd",
+    "nlps",
+    "ntplib",
+    "psutil",
     "webserver"
   ],
   "cSpell.language": "en-US",

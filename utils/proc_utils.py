@@ -19,9 +19,9 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from os import getpid
-from time import gmtime, sleep, strftime, time
+from time import gmtime, strftime
 
 from elevate import elevate
 from psutil import Process
