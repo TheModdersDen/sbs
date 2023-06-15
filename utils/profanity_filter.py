@@ -22,8 +22,7 @@
 from os import getcwd
 from os.path import pathsep
 
-import spacy
-from profanity_filter import ProfanityFilter
+from os_utils import OSUtils
 
 from sbs import SBS
 
@@ -34,6 +33,20 @@ class SBSProfanityFilter():
     def __main__(self, extra_filter_words=[], censor=False, log_profanity_filter=False) -> object:
 
         self.sbs = SBS()
+        self.os_utils = OSUtils()
+
+        if self.os_utils._os == 'Linux':
+            import spacy
+            from profanity_filter import ProfanityFilter
+
+            self.nlp = spacy.load('en_core_web_sm')
+            self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
+                                      censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
+        else:
+            self.sbs.logger.error(
+                "Profanity filter: Only Linux is supported at this time")
+            raise Exception(
+                "Profanity filter: Only Linux is supported at this time")
 
         # Should we log the profanity filter?
         if log_profanity_filter:
@@ -54,10 +67,6 @@ class SBSProfanityFilter():
         else:
             self.extra_filter_words = extra_filter_words  # Extra words to filter out
         self.censor = censor  # Should the words be censored or removed?
-
-        self.nlp = spacy.load('en_core_web_sm')
-        self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
-                                  censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
 
         self.sbs.logger.debug('Profanity filter initialized')
 
