@@ -28,6 +28,8 @@ from sbs import SBS
 
 
 # A class to filter out profanity from the ShowerThoughts Briefing Skill
+
+
 class SBSProfanityFilter():
 
     def __main__(self, extra_filter_words=[], censor=False, log_profanity_filter=False) -> object:
@@ -68,6 +70,10 @@ class SBSProfanityFilter():
         else:
             self.extra_filter_words = extra_filter_words  # Extra words to filter out
         self.censor = censor  # Should the words be censored or removed?
+
+        self.nlp = spacy.load('en')
+        self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
+                                  censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
 
         self.sbs.logger.debug('Profanity filter initialized')
 

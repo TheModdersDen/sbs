@@ -30,6 +30,7 @@ from sbs import SBS
 
 
 # A class to handle the feed generation for the ShowerThoughts Briefing Skill
+
 class FeedUtils():
 
     def __main__(self) -> object:

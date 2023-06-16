@@ -136,4 +136,5 @@ logs/
 VARS_SET
 
 # Logs
-logs/*
+logs/*.log
+logs/*.txt

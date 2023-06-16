@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "usernamehw.errorlens",
+    "cschlosser.doxdocgen",
+    "ms-azuretools.vscode-docker",
+    "mikestead.dotenv",
+    "circleci.circleci",
+    "aaron-bond.better-comments",
+    "ms-python.autopep8",
+    "ask-toolkit.alexa-skills-kit-toolkit",
+    "github.copilot",
+    "github.copilot-chat",
+    "github.copilot-labs",
+    "eamodio.gitlens",
+    "ms-vsliveshare.vsliveshare",
+    "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+    "donjayamanne.python-extension-pack",
+    "kevinrose.vsc-python-indent"
+  ]
+}

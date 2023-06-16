@@ -34,10 +34,7 @@ import logging
 import os
 import random
 import re
-import shutil
-import sys
-import time
-import traceback
+from time import sleep, time, strftime, gmtime
 import urllib.parse
 import urllib.request
 import uuid
@@ -55,8 +52,10 @@ from dotenv import load_dotenv
 
 from utils.feed_utils import FeedUtils
 from utils.os_utils import OSUtils
+from utils.proc_utils import ProcUtils
 from utils.profanity_filter import ProfanityFilter
 
+from argparse import ArgumentParser, Namespace
 
 # The main SBS class
 class SBS(object):
@@ -82,6 +81,7 @@ class SBS(object):
 
         self.feed_utils = FeedUtils()
         self.os_utils = OSUtils()
+        self.proc_utils = ProcUtils()
         self.env_vars = []
         handler = logging.FileHandler(
             getcwd() + f"{pathsep}logs{pathsep}sbs_latest.log")
@@ -116,3 +116,34 @@ class SBS(object):
         self.args = self.arg_parser.parse_args()
 
         return self.args
+
+
+    # Handle the main logic of the skill
+    def process_data(self):
+        # Elevate the process if needed
+        if self.proc_utils.is_elevated():
+            self.logger.debug(
+                'SBS Skill running with elevated privileges, no need to elevate...')
+        else:
+            self.logger.debug(
+                'SBS Skill not running with elevated privileges, elevating...')
+            self.proc_utils.elevate()
+
+        # Get the current process
+        self.current_process = self.proc_utils.get_current_process()
+
+        # Parse the Reddit RSS feed
+        self.feed_utils.parse_feed(
+            f"https://reddit.com/r/showerthoughts/top.rss?t={self.args.rate}&limit={self.args.limit}")
+
+        self.logger.debug('SBS Skill processing data...')
+
+        # Get the thoughts from the feed
+        self.current_thoughts = self.feed_utils.get_thoughts()
+
+        if self.args.save:
+            # Save the thoughts to a text file
+            self.os_utils.save_thoughts(self.current_thoughts)
+
+        # Get the thoughts from the feed
+        self.feed_utils.generate_feed(self.current_thoughts)
