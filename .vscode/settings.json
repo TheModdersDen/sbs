@@ -4,8 +4,9 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
-  ],
-    "webserver"
+  },
+  "cSpell.words": [
+    "webserver",
     "psutil",
     "ntplib",
     "nlps",
@@ -16,10 +17,10 @@
     "gethostname",
     "boto",
     "badwords",
-    "autopep8",
-  "cSpell.words": [
+    "autopep8"
+  ],
   "[python]": {
     "editor.defaultFormatter": "ms-python.autopep8"
   },
-  "python.formatting.provider": "none",
+  "python.formatting.provider": "none"
 }
