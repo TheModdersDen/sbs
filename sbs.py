@@ -34,7 +34,6 @@ import logging
 import os
 import random
 import re
-from time import sleep, time, strftime, gmtime
 import urllib.parse
 import urllib.request
 import uuid
@@ -43,6 +42,7 @@ from argparse import ArgumentParser, Namespace
 from configparser import ConfigParser
 from datetime import datetime, timedelta
 from os import getcwd, pathsep
+from time import gmtime, sleep, strftime, time
 
 import boto3
 import feedparser
@@ -50,12 +50,12 @@ import pytz
 from boto3.dynamodb.conditions import Attr, Key
 from dotenv import load_dotenv
 
+from utils.cfg_utils import CFGUtils
 from utils.feed_utils import FeedUtils
 from utils.os_utils import OSUtils
 from utils.proc_utils import ProcUtils
 from utils.profanity_filter import ProfanityFilter
 
-from argparse import ArgumentParser, Namespace
 
 # The main SBS class
 class SBS(object):
@@ -67,6 +67,8 @@ class SBS(object):
         load_dotenv()
         self.args = self.handle_cmdline()
         # Initialize the variables
+        self.cfg_utils = CFGUtils()
+        self.cfg_parser = self.cfg_utils.cfg_parser
         self.extra_profanity_words = None
         if self.args.profanity is True:
             try:
@@ -88,7 +90,7 @@ class SBS(object):
         self.logger = logging.getLogger("sbs_skill")
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
-
+        
         self.feed_utils.parse_feed()
 
     def handle_cmdline(self) -> Namespace:
@@ -96,14 +98,12 @@ class SBS(object):
             description='ShowerThoughts Briefing Skill')
         self.arg_parser.add_argument(
             '-r', '--rate', help='The rate to refresh the ShowerThoughts (which feed to pull it from?)', required=True, dest='rate', type=str)
-        self.arg_parser.add_argument('-l', '--log', help='Log the output to a file?',
-                                     required=False, action='store_true', default=False, dest='log', type=bool)
         self.arg_parser.add_argument('-p', '--profanity', help='Filter out profanity?',
-                                     required=True, action='store_true', default=False, dest='profanity', type=bool)
+                                     required=True, action='store_true', default=True, dest='profanity', type=bool)
         self.arg_parser.add_argument('-c', '--censor', help='Censor the profanity?',
                                      required=False, action='store_true', default=True, dest='censor', type=bool)
         self.arg_parser.add_argument(
-            '-x', '--extra', help='Extra profanity word file to filter out profanity with', required=False, dest='extra', type=str)
+            '-x', '--extra-words', help='Extra profanity word file to filter out profanity with', required=False, dest='extra_words', type=str)
         self.arg_parser.add_argument('-d', '--debug', help='Debug mode?', required=False,
                                      action='store_true', default=False, dest='debug', type=bool)
         self.arg_parser.add_argument('-e', '--experimental', help='Experimental mode?',
@@ -117,8 +117,8 @@ class SBS(object):
 
         return self.args
 
-
     # Handle the main logic of the skill
+
     def process_data(self):
         # Elevate the process if needed
         if self.proc_utils.is_elevated():

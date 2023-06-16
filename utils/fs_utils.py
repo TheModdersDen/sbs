@@ -21,5 +21,84 @@
 
 #! A filesystem utilities class for the ShowerThoughts Briefing Skill
 
+from os import mkdir
+from os.path import exists, isdir, isfile, join
+
+from sbs import SBS
+
+
 class FSUtils():
-    pass
+
+    def __main__(self):
+        self.sbs = SBS()
+        self.logger = self.sbs.logger
+
+        self.logger.debug('FS Utils initializing...')
+
+        self._rss_export_path = self.sbs.cfg_parser.get(
+            'DEFAULT', 'rss_export_path')
+        try:
+            if self._rss_export_path is not None:
+                self.logger.debug(
+                    f'RSS export path set to: {self._rss_export_path}')
+                if self.folder_exists(self._rss_export_path):
+                    self.logger.debug(
+                        f'RSS export path exists: {self._rss_export_path}')
+                else:
+                    self.logger.debug(
+                        "RSS export path doesn't exist. Attempting to create it...")
+                    self.create_folder(self._rss_export_path)
+        except Exception as e:
+            self.logger.error(
+                f'Error setting or creating RSS export path: {e}')
+
+    # Check if a folder exists
+
+    def folder_exists(self, folder_path: str) -> bool:
+        if folder_path is not None:
+            if exists(folder_path):
+                if isdir(folder_path):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+    # Check if a file exists
+    def file_exists(self, file_path: str) -> bool:
+        if file_path is not None:
+            if exists(file_path):
+                if isfile(file_path):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+    # Join paths
+    def join_paths(self, *args) -> str:
+        return join(*args)
+
+    # Create a folder
+    def create_folder(self, folder_path: str) -> bool:
+        if self.folder_exists(folder_path):
+            return True
+        else:
+            try:
+                mkdir(folder_path)
+                return True
+            except Exception as e:
+                self.logger.error(f'Error creating folder: {e}')
+                return False
+
+    # Create an empty file
+    def create_file(self, file_path: str) -> bool:
+        if self.file_exists(file_path):
+            return True
+        else:
+            try:
+                open(file_path, 'w').close()
+                return True
+            except Exception as e:
+                self.sbs.logger.error(f'Error creating file: {e}')
+                return False

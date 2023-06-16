@@ -85,6 +85,12 @@ class CFGUtils():
             self.cfg_parser.set('DEFAULT', 'sound_effects', 'False')
             # Set the volume of the sound effects
             self.cfg_parser.set('DEFAULT', 'tts_responses', 'False')
+            # Set the rss export path
+            self.cfg_parser.set(
+                'DEFAULT', 'rss_export_path', '/var/www/html/st/rss')
+            self.cfg_parser.set('DEFAULT', 'rss_export_filename',
+                                f'st_{self.sbs.args.rate}.xml')
+            
 
         self.logger.debug('CFG Utils initialized')
 

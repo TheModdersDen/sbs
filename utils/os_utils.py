@@ -19,6 +19,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
+from datetime import date, datetime, timedelta
 from os.path import exists, isdir, isfile, join
 # A utility class for the ShowerThoughts Briefing Skill to handle OS specific functions
 from platform import (architecture, libc_ver, mac_ver, machine, node, platform,
@@ -64,3 +65,18 @@ class OSUtils():
         # Python specific variables
         self._python_ver = python_version()
         self._python_impl = python_implementation()
+
+        self._tz = self.get_timezone()
+
+    # Get the system's timezone using pytz and datetime:
+
+    def get_timezone(self) -> str:
+        import pytz
+
+        try:
+            tz_string = datetime.now().astimezone().tzname()
+            tz = pytz.timezone(tz_string)
+            return tz
+        except Exception as e:
+            self.sbs.logger.error(f'Error getting timezone: {e}')
+            return None

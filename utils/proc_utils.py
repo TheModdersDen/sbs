@@ -30,7 +30,6 @@ from psutil import Process
 from sbs import SBS
 
 
-
 class ProcUtils():
 
     def __main__(self):

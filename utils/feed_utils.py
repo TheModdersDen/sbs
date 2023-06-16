@@ -19,17 +19,13 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
-import io
-from os import getcwd, pathsep
-from time import gmtime, sleep, strftime, time
-
 from feedgenerator import Enclosure, Rss201rev2Feed
 from feedparser import parse
 
 from sbs import SBS
 
-
 # A class to handle the feed generation for the ShowerThoughts Briefing Skill
+
 
 class FeedUtils():
 
@@ -40,5 +36,46 @@ class FeedUtils():
 
         self.sbs.logger.debug('Feed Utils initialized')
 
+    # Parse the feed using feedparser
     def parse_feed(self, feed_url: str) -> object:
-        pass
+        try:
+            self.sbs.logger.debug(f'Parsing feed: {feed_url}')
+            feed = parse(feed_url)
+            self.sbs.logger.debug(f'Parsed feed: {feed}')
+            return feed
+        except Exception as e:
+            self.sbs.logger.error(f'Error parsing feed: {e}')
+            return None
+
+    # Process the feed using feedgenerator and the parsed feed, and return the feed as a list
+    def process_feed(self, feed: object) -> list:
+        if feed is not None:
+            try:
+                self.sbs.logger.debug(f'Processing feed: {feed}')
+                feed_list = []
+                for entry in feed.entries:
+                    feed_list.append(entry)
+                self.sbs.logger.debug(f'Processed feed: {feed_list}')
+                return feed_list
+            except Exception as e:
+                self.sbs.logger.error(f'Error processing feed: {e}')
+                return None
+        else:
+            self.sbs.logger.error('The feed has nothing to process!')
+            raise Exception('The feed has nothing to process!')
+
+    def generate_feed(self, feed_list: list) -> object:
+        if feed_list is not None:
+            rss_list = []
+            try:
+                self.sbs.logger.debug(f'Generating feed: {feed_list}')
+                feed = Rss201rev2Feed(
+                    title='ShowerThoughts Briefing',
+                    link='https://st.monsterspawned.com/st/'
+                )
+                for entry in feed_list:
+                    rss_list.append(feed.add_item(feed_item=entry))
+                self.sbs.logger.debug(f'Generated feed: {rss_list}')
+            except Exception as e:
+                self.sbs.logger.error(f'Error generating feed: {e}')
+                return None
