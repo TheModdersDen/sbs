@@ -22,19 +22,18 @@
 from configparser import ConfigParser
 from os import getcwd, pathsep
 
-from utils.log_utils import LogUtils
+from sbs import SBS
 
 #! A class to handle the configuration for the ShowerThoughts Briefing Skill
 
 
 class CFGUtils():
 
-    def __main__(self, rate: str = "day") -> object:
-        self.log_utils = LogUtils()
-
+    def __main__(self) -> object:
+        self.sbs = SBS()
         self.logger = self.sbs.logger
 
-        self.log_utils.log_msg('CFG Utils initializing...')
+        self.logger.debug('CFG Utils initializing...')
         # Get the current working directory
         self.cwd = getcwd()
 
@@ -67,12 +66,12 @@ class CFGUtils():
 
         # If the config file doesn't exist, create it
         try:
-            self.log_utils.log_msg('Checking if config file exists...')
+            self.logger.debug('Checking if config file exists...')
             self.cfg_parser.read(self.cfg_path)
-            self.log_utils.log_msg('Config file exists')
+            self.logger.debug('Config file exists')
         except Exception as e:
             self.logger.error(f'Config file does not exist: {e}')
-            self.log_utils.log_msg('Creating config file...')
+            self.logger.debug('Creating config file...')
             self.cfg_parser.write(self.cfg_path)
         finally:
             # Set the default config values
@@ -88,17 +87,18 @@ class CFGUtils():
             self.cfg_parser.set('DEFAULT', 'tts_responses', 'False')
             # Set the rss export path
             self.cfg_parser.set(
-                'DEFAULT', 'rss_export_path', '/var/www/html/st/')
+                'DEFAULT', 'rss_export_path', '/var/www/html/st/rss')
             self.cfg_parser.set('DEFAULT', 'rss_export_filename',
-                                f'st_{rate}.xml')
+                                f'st_{self.sbs.args.rate}.xml')
+            
 
-        self.log_utils.log_msg('CFG Utils initialized')
+        self.logger.debug('CFG Utils initialized')
 
     # Set a config value
     def set_value(self, section: str, option: str, value: str) -> bool:
         try:
             self.cfg_parser.set(section, option, value)
-            self.log_utils.log_msg(f'Set config value: {option} to {value}')
+            self.logger.debug(f'Set config value: {option} to {value}')
             return True
         except Exception as e:
             self.logger.error(f'Error setting config value: {e}')
@@ -108,7 +108,7 @@ class CFGUtils():
     def get_value(self, section: str, option: str) -> str:
         try:
             value = self.cfg_parser.get(section, option)
-            self.log_utils.log_msg(f'Got config value: {value}')
+            self.logger.debug(f'Got config value: {value}')
             return value
         except Exception as e:
             self.logger.error(f'Error getting config value: {e}')
@@ -117,9 +117,9 @@ class CFGUtils():
     # Get the config sections
     def get_config_sections(self) -> list:
         try:
-            self.log_utils.log_msg('Getting config sections...')
+            self.logger.debug('Getting config sections...')
             sections = self.cfg_parser.sections()
-            self.log_utils.log_msg(f'Got config sections: {sections}')
+            self.logger.debug(f'Got config sections: {sections}')
             return sections
         except Exception as e:
             self.logger.error(f'Error getting config sections: {e}')
@@ -128,9 +128,9 @@ class CFGUtils():
     # Get the config defaults
     def get_config_defaults(self) -> dict:
         try:
-            self.log_utils.log_msg('Getting config defaults...')
+            self.logger.debug('Getting config defaults...')
             defaults = self.cfg_parser.defaults()
-            self.log_utils.log_msg(f'Got config defaults: {defaults}')
+            self.logger.debug(f'Got config defaults: {defaults}')
             return defaults
         except Exception as e:
             self.logger.error(f'Error getting config defaults: {e}')
@@ -139,9 +139,9 @@ class CFGUtils():
     # Get the config options
     def get_config_options(self) -> list:
         try:
-            self.log_utils.log_msg('Getting config options...')
+            self.logger.debug('Getting config options...')
             options = self.cfg_parser.options('DEFAULT')
-            self.log_utils.log_msg(f'Got config options: {options}')
+            self.logger.debug(f'Got config options: {options}')
             return options
         except Exception as e:
             self.logger.error(f'Error getting config options: {e}')

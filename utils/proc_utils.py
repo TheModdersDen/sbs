@@ -26,27 +26,24 @@ from time import gmtime, strftime
 from elevate import elevate
 from psutil import Process
 
-from utils.log_utils import LogUtils
-
 #! Process related utilities
+from sbs import SBS
 
 
 class ProcUtils():
 
-    log_utils = LogUtils()
-    logger = log_utils.get_sbs_logger()
-
     def __main__(self):
-        self.log_utils = LogUtils()
+        self.sbs = SBS()
+        self.logger = self.sbs.logger
 
-        self.log_utils.log_msg('Proc Utils initializing...', 'DEBUG')
+        self.logger.debug('Proc Utils initializing...')
 
     # Get the current process ID
     def get_process_id(self) -> int:
         try:
-            self.log_utils.log_msg('Getting process ID...')
+            self.logger.debug('Getting process ID...')
             pid = getpid()
-            self.log_utils.log_msg(f'Got process ID: {pid}')
+            self.logger.debug(f'Got process ID: {pid}')
             return pid
         except Exception as e:
             self.logger.error(f'Error getting process ID: {e}')
@@ -55,10 +52,10 @@ class ProcUtils():
     # Get the current process
     def get_current_process(self) -> Process:
         try:
-            self.log_utils.log_msg('Getting current process...')
+            self.logger.debug('Getting current process...')
             pid = self.get_process_id()
             p = Process(pid)
-            self.log_utils.log_msg(f'Got current process: {p}')
+            self.logger.debug(f'Got current process: {p}')
             return p
         except Exception as e:
             self.logger.error(f'Error getting current process: {e}')
@@ -67,10 +64,10 @@ class ProcUtils():
     # Get the current process CPU usage
     def get_process_cpu_usage(self) -> float:
         try:
-            self.log_utils.log_msg('Getting process CPU usage...')
+            self.logger.debug('Getting process CPU usage...')
             p = self.get_current_process()
             cpu_usage = p.cpu_percent(interval=1)
-            self.log_utils.log_msg(f'Got process CPU usage: {cpu_usage}')
+            self.logger.debug(f'Got process CPU usage: {cpu_usage}')
             return cpu_usage
         except Exception as e:
             self.logger.error(f'Error getting process CPU usage: {e}')
@@ -79,10 +76,10 @@ class ProcUtils():
     # Get the current process memory usage
     def get_process_memory_usage(self) -> float:
         try:
-            self.log_utils.log_msg('Getting process memory usage...')
+            self.logger.debug('Getting process memory usage...')
             p = self.get_current_process()
             mem_usage = p.memory_percent()
-            self.log_utils.log_msg(f'Got process memory usage: {mem_usage}')
+            self.logger.debug(f'Got process memory usage: {mem_usage}')
             return mem_usage
         except Exception as e:
             self.logger.error(f'Error getting process memory usage: {e}')
@@ -91,10 +88,10 @@ class ProcUtils():
     # Get the current process CPU and memory usage
     def get_cpu_and_memory_usage(self) -> tuple:
         try:
-            self.log_utils.log_msg('Getting process CPU and memory usage...')
+            self.logger.debug('Getting process CPU and memory usage...')
             cpu_usage = self.get_process_cpu_usage()
             mem_usage = self.get_process_memory_usage()
-            self.log_utils.log_msg(
+            self.logger.debug(
                 f'Got process CPU and memory usage: {cpu_usage}, {mem_usage}')
             return (cpu_usage, mem_usage)
         except Exception as e:
@@ -105,11 +102,10 @@ class ProcUtils():
     # Get the process file location
     def get_process_file_location(self) -> str:
         try:
-            self.log_utils.log_msg('Getting process file location...')
+            self.logger.debug('Getting process file location...')
             p = self.get_current_process()
             file_location = p.exe()
-            self.log_utils.log_msg(
-                f'Got process file location: {file_location}')
+            self.logger.debug(f'Got process file location: {file_location}')
             return file_location
         except Exception as e:
             self.logger.error(f'Error getting process file location: {e}')
@@ -118,10 +114,10 @@ class ProcUtils():
     # Get the process file name
     def get_process_file_name(self) -> str:
         try:
-            self.log_utils.log_msg('Getting process file name...')
+            self.logger.debug('Getting process file name...')
             p = self.get_current_process()
             file_name = p.name()
-            self.log_utils.log_msg(f'Got process file name: {file_name}')
+            self.logger.debug(f'Got process file name: {file_name}')
             return file_name
         except Exception as e:
             self.logger.error(f'Error getting process file name: {e}')
@@ -130,10 +126,10 @@ class ProcUtils():
     # Get how long the process has been running
     def get_process_uptime(self) -> timedelta:
         try:
-            self.log_utils.log_msg('Getting process uptime...')
+            self.logger.debug('Getting process uptime...')
             p = self.get_current_process()
             uptime = p.create_time()
-            self.log_utils.log_msg(f'Got process uptime: {uptime}')
+            self.logger.debug(f'Got process uptime: {uptime}')
             return uptime
         except Exception as e:
             self.logger.error(f'Error getting process uptime: {e}')
@@ -142,10 +138,10 @@ class ProcUtils():
     # Check to see if the process is running
     def is_process_running(self) -> bool:
         try:
-            self.log_utils.log_msg('Checking if process is running...')
+            self.logger.debug('Checking if process is running...')
             p = self.get_current_process()
             is_running = p.is_running()
-            self.log_utils.log_msg(f'Process is running: {is_running}')
+            self.logger.debug(f'Process is running: {is_running}')
             return is_running
         except Exception as e:
             self.logger.error(f'Error checking if process is running: {e}')
@@ -154,47 +150,46 @@ class ProcUtils():
     # Check to see if the process is running as root/superuser/admin
     def is_elevated(self) -> bool:
         try:
-            self.log_utils.log_msg(
-                'Checking if process is running as root/superuser/admin...', 'DEBUG')
+            self.logger.debug(
+                'Checking if process is running as root/superuser/admin...')
             is_elevated = elevate.is_root()
-            self.log_utils.log_msg(
-                f'Process with pid of {getpid()} is running as root/superuser/admin: {is_elevated}', 'DEBUG')
+            self.logger.debug(
+                f'Process with pid of {getpid()} is running as root/superuser/admin: {is_elevated}')
             return is_elevated
         except Exception as e:
-            self.log_utils.log_msg(
-                f'Error checking if process is running as root/superuser/admin: {e}', 'ERROR')
+            self.logger.error(
+                f'Error checking if process is running as root/superuser/admin: {e}')
             return None
 
     # Elevate the process to root/superuser/admin
     def elevate(self) -> bool:
         if self.is_elevated():
-            self.log_utils.log_msg(
-                'Process is already running as root/superuser/admin, skipping...', 'DEBUG')
+            self.logger.debug(
+                'Process is already running as root/superuser/admin, skipping...')
             return True
         else:
             try:
-                self.log_utils.log_msg(
-                    'Elevating process to root/superuser/admin...', 'DEBUG')
+                self.logger.debug(
+                    'Elevating process to root/superuser/admin...')
                 elevate()
-                self.log_utils.log_msg(
-                    'Process elevated to root/superuser/admin', 'DEBUG')
+                self.logger.debug('Process elevated to root/superuser/admin')
                 return True
             except Exception as e:
                 self.logger.error(
-                    f'Error elevating process to root/superuser/admin: {e}', 'ERROR')
+                    f'Error elevating process to root/superuser/admin: {e}')
                 return False
 
     # Get the process uptime in a human readable format
     def get_readable_uptime(self) -> str:
         try:
-            self.log_utils.log_msg(
-                'Getting process uptime in a human readable format...', 'DEBUG')
+            self.logger.debug(
+                'Getting process uptime in a human readable format...')
             uptime = self.get_process_uptime()
             readable_uptime = strftime('%H:%M:%S', gmtime(uptime))
-            self.log_utils.log_msg(
-                f'Got process uptime in a human readable format: {readable_uptime}', 'DEBUG')
+            self.logger.debug(
+                f'Got process uptime in a human readable format: {readable_uptime}')
             return readable_uptime
         except Exception as e:
             self.logger.error(
-                f'Error getting process uptime in a human readable format: {e}', 'ERROR')
+                f'Error getting process uptime in a human readable format: {e}')
             return None

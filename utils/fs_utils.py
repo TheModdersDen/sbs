@@ -24,30 +24,28 @@
 from os import mkdir
 from os.path import exists, isdir, isfile, join
 
-from utils.log_utils import LogUtils
+from sbs import SBS
 
 
 class FSUtils():
 
     def __main__(self):
+        self.sbs = SBS()
+        self.logger = self.sbs.logger
 
-        self.log_utils = LogUtils()
-
-        self.logger = self.log_utils.logger
-
-        self.log_utils.log_msg('FS Utils initializing...')
+        self.logger.debug('FS Utils initializing...')
 
         self._rss_export_path = self.sbs.cfg_parser.get(
             'DEFAULT', 'rss_export_path')
         try:
             if self._rss_export_path is not None:
-                self.log_utils.log_msg(
+                self.logger.debug(
                     f'RSS export path set to: {self._rss_export_path}')
                 if self.folder_exists(self._rss_export_path):
-                    self.log_utils.log_msg(
+                    self.logger.debug(
                         f'RSS export path exists: {self._rss_export_path}')
                 else:
-                    self.log_utils.log_msg(
+                    self.logger.debug(
                         "RSS export path doesn't exist. Attempting to create it...")
                     self.create_folder(self._rss_export_path)
         except Exception as e:
@@ -107,10 +105,10 @@ class FSUtils():
 
     def save_thoughts(self, current_thoughts: list) -> None:
         try:
-            self.log_utils.log_msg(
+            self.logger.debug(
                 f'Saving thoughts to file: {self._rss_export_path}')
             with open(self._rss_export_path, 'w') as f:
                 f.write(current_thoughts)
-            self.log_utils.log_msg('Saved thoughts to file')
+            self.logger.debug('Saved thoughts to file')
         except Exception as e:
             self.logger.error(f'Error saving thoughts to file: {e}')
