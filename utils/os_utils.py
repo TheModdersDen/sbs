@@ -28,14 +28,14 @@ from platform import (architecture, libc_ver, mac_ver, machine, node, platform,
 
 import distro
 
-from sbs import SBS
+from utils.log_utils import LogUtils
 
 
 class OSUtils():
 
     def __main__(self) -> object:
+        self.log_utils = LogUtils()
         # OS specific variables
-        self.sbs = SBS()
         self._os = system()
         self._system = platform()
         self._arch = architecture()
@@ -78,5 +78,5 @@ class OSUtils():
             tz = pytz.timezone(tz_string)
             return tz
         except Exception as e:
-            self.sbs.logger.error(f'Error getting timezone: {e}')
+            self.log_utils.logger.error(f'Error getting timezone: {e}')
             return None
