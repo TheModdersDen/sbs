@@ -36,6 +36,8 @@ class FeedUtils():
 
         self.sbs.logger.debug('Feed Utils initializing...')
 
+        self.rss_feed_last_build_date = getenv('RSS_FEED_LAST_BUILD_DATE')
+
         self.sbs.logger.debug('Feed Utils initialized')
 
     # Parse the feed using feedparser
@@ -79,6 +81,10 @@ class FeedUtils():
                     feed_url=getenv('RSS_FEED_URL_DIRECT'),
                     ttl=getenv('RSS_FEED_TTL'),
                     generator=getenv('RSS_FEED_GENERATOR'),
+                    lastBuildDate=getenv(f'{self.rss_feed_last_build_date}'),
+                    webMaster=getenv('RSS_FEED_WEBMASTER'),
+                    pubDate=getenv('RSS_FEED_PUBDATE')
+
                 )
                 for entry in feed_list:
                     rss_list.append(feed.add_item(feed_item=entry))
