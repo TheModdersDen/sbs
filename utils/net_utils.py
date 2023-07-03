@@ -25,27 +25,27 @@
 
 from datetime import datetime, timedelta
 from os.path import exists, isdir, isfile, join
-from time import gmtime, sleep, strftime, time
 
 from sbs import SBS
-from utils.log_utils import LogUtils
 from utils.os_utils import OSUtils
+
+from datetime import datetime, timedelta
+from time import sleep, time, strftime, gmtime
 
 
 class NetworkUtils():
 
     def __main__(self):
-        self.log_utils = LogUtils()
-
-        self.logger = self.log_utils.logger
+        self.sbs = SBS()
+        self.logger = self.sbs.logger
         self.os_utils = OSUtils()
 
-        self.log_utils.log_msg('Network Utils initializing...')
+        self.logger.debug('Network Utils initializing...')
 
     # Get the current date and time from the internet, using the NTP protocol and the device's local time zone
     def date_time_from_internet(self) -> datetime:
         try:
-            self.log_utils.log_msg('Getting date and time from internet...')
+            self.logger.debug('Getting date and time from internet...')
             # Get the current date and time from the internet, using the NTP protocol and the device's local time zone
             # Code from: https://stackoverflow.com/questions/1101508/how-to-parse-the-output-of-time-zone-dump
             from datetime import datetime, timedelta
@@ -61,8 +61,7 @@ class NetworkUtils():
             try:
                 response = c.request('pool.ntp.org', version=3)
                 dt = datetime.fromtimestamp(response.tx_time)
-                self.log_utils.log_msg(
-                    f'Got date and time from internet: {dt}')
+                self.logger.debug(f'Got date and time from internet: {dt}')
                 return dt
             except NTPException:
                 self.logger.error(
@@ -76,7 +75,7 @@ class NetworkUtils():
     # Download a file, put it into a folder, and return True if successful, False if not
     def download_file(self, url: str, file_name: str, output_dir: str) -> bool:
         try:
-            self.log_utils.log_msg(
+            self.logger.debug(
                 f'Downloading file from {url} to {output_dir}{file_name}...')
             from os import makedirs, path
             from os.path import exists
@@ -96,7 +95,7 @@ class NetworkUtils():
                     with open(path.join(output_dir, file_name), 'wb') as f:
                         r.raw.decode_content = True
                         copyfileobj(r.raw, f)
-                    self.log_utils.log_msg(
+                    self.logger.debug(
                         f'File downloaded successfully to {output_dir}{file_name}')
                     return True
                 else:
