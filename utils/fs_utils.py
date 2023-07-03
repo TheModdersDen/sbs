@@ -102,3 +102,13 @@ class FSUtils():
             except Exception as e:
                 self.sbs.logger.error(f'Error creating file: {e}')
                 return False
+
+    def save_thoughts(self, current_thoughts: list) -> None:
+        try:
+            self.logger.debug(
+                f'Saving thoughts to file: {self._rss_export_path}')
+            with open(self._rss_export_path, 'w') as f:
+                f.write(current_thoughts)
+            self.logger.debug('Saved thoughts to file')
+        except Exception as e:
+            self.logger.error(f'Error saving thoughts to file: {e}')

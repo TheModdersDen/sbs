@@ -19,6 +19,8 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  """
 
+from os import getenv
+
 from feedgenerator import Enclosure, Rss201rev2Feed
 from feedparser import parse
 
@@ -70,8 +72,13 @@ class FeedUtils():
             try:
                 self.sbs.logger.debug(f'Generating feed: {feed_list}')
                 feed = Rss201rev2Feed(
-                    title='ShowerThoughts Briefing',
-                    link='https://st.monsterspawned.com/st/'
+                    title=getenv('RSS_FEED_TITLE'),
+                    link=getenv('RSS_FEED_URL'),
+                    description=getenv('RSS_FEED_DESCRIPTION'),
+                    language=getenv('RSS_FEED_LANGUAGE'),
+                    feed_url=getenv('RSS_FEED_URL_DIRECT'),
+                    ttl=getenv('RSS_FEED_TTL'),
+                    generator=getenv('RSS_FEED_GENERATOR'),
                 )
                 for entry in feed_list:
                     rss_list.append(feed.add_item(feed_item=entry))

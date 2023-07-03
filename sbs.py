@@ -45,13 +45,13 @@ from os import getcwd, pathsep
 from time import gmtime, sleep, strftime, time
 
 import boto3
-import feedparser
 import pytz
 from boto3.dynamodb.conditions import Attr, Key
 from dotenv import load_dotenv
 
 from utils.cfg_utils import CFGUtils
 from utils.feed_utils import FeedUtils
+from utils.fs_utils import FSUtils
 from utils.os_utils import OSUtils
 from utils.proc_utils import ProcUtils
 from utils.profanity_filter import ProfanityFilter
@@ -83,6 +83,7 @@ class SBS(object):
 
         self.feed_utils = FeedUtils()
         self.os_utils = OSUtils()
+        self.fs_utils = FSUtils()
         self.proc_utils = ProcUtils()
         self.env_vars = []
         handler = logging.FileHandler(
@@ -90,7 +91,7 @@ class SBS(object):
         self.logger = logging.getLogger("sbs_skill")
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
-        
+
         self.feed_utils.parse_feed()
 
     def handle_cmdline(self) -> Namespace:
@@ -143,7 +144,7 @@ class SBS(object):
 
         if self.args.save:
             # Save the thoughts to a text file
-            self.os_utils.save_thoughts(self.current_thoughts)
+            self.fs_utils.save_thoughts(self.current_thoughts)
 
         # Get the thoughts from the feed
         self.feed_utils.generate_feed(self.current_thoughts)

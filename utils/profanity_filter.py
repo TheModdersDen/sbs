@@ -26,7 +26,6 @@ from os_utils import OSUtils
 
 from sbs import SBS
 
-
 # A class to filter out profanity from the ShowerThoughts Briefing Skill
 
 
@@ -45,11 +44,23 @@ class SBSProfanityFilter():
             self.nlp = spacy.load('en_core_web_sm')
             self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
                                       censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
+        elif self.os_utils._os == 'Windows':
+            self.sbs.logger.error(
+                "Profanity filter: Windows is not supported at this time")
+            raise Exception(
+                "Profanity filter: Windows is not supported at this time")
+        elif self.os_utils._os == 'Darwin':
+            import spacy
+            from profanity_filter import ProfanityFilter
+
+            self.nlp = spacy.load('en_core_web_sm')
+            self.pf = ProfanityFilter(extra_profane_word_dictionaries=self.extra_filter_words,
+                                      censor_whole_words=self.censor, censor_char='*', nlps={'en': self.nlp})
         else:
             self.sbs.logger.error(
-                "Profanity filter: Only Linux is supported at this time")
+                "Profanity filter: You are running an unknown OS, only Linux is supported at this time")
             raise Exception(
-                "Profanity filter: Only Linux is supported at this time")
+                "Profanity filter: You are running an unknown OS, only Linux is supported at this time")
 
         # Should we log the profanity filter?
         if log_profanity_filter:
