@@ -25,75 +25,126 @@
 #   - Generates the response in the Alexa format
 #   - Sends the response to Alexa for the user
 
+import base64
+import gzip
+import hashlib
+import hmac
+import json
 import logging
 import os
 import random
 import re
-import time
 import urllib.parse
 import urllib.request
-import xml.etree.ElementTree as ET
-import feedparser
-from datetime import datetime, timedelta
-import pytz
-import json
-import boto3
-from boto3.dynamodb.conditions import Key, Attr
 import uuid
-import hashlib
-import hmac
-import base64
-import gzip
-import shutil
-import traceback
-import sys
-from dotenv import load_dotenv
-from os import getcwd, pathsep
-
-from utils.feed_utils import FeedUtils
-from utils.os_utils import OSUtils
-from utils.profanity_filter import ProfanityFilter
-
+import xml.etree.ElementTree as ET
 from argparse import ArgumentParser, Namespace
 from configparser import ConfigParser
+from datetime import datetime, timedelta
+from os import getcwd, pathsep
+from time import gmtime, sleep, strftime, time
+
+import boto3
+import pytz
+from boto3.dynamodb.conditions import Attr, Key
+from dotenv import load_dotenv
+
+from utils.cfg_utils import CFGUtils
+from utils.feed_utils import FeedUtils
+from utils.fs_utils import FSUtils
+from utils.os_utils import OSUtils
+from utils.proc_utils import ProcUtils
+from utils.profanity_filter import ProfanityFilter
 
 
 # The main SBS class
 class SBS(object):
-    
-    # Initialize the class    
+
+    # Initialize the class
     def __main__(self) -> object:
-        
+
         # Load the environment variables
         load_dotenv()
-        
+        self.args = self.handle_cmdline()
         # Initialize the variables
-        self.extra_profanity_words = []
-        self.profanity_filter = ProfanityFilter(self.extra_profanity_words, False)
+        self.cfg_utils = CFGUtils()
+        self.cfg_parser = self.cfg_utils.cfg_parser
+        self.extra_profanity_words = None
+        if self.args.profanity is True:
+            try:
+                with open(getcwd() + f"data{pathsep}badwords.txt", "r") as f:
+                    self.extra_profanity_words = f.read().splitlines()
+                self.profanity_filter = ProfanityFilter(
+                    self.extra_profanity_words, False)
+            except Exception as e:
+                self.logger.error(f"Error loading extra profanity words: {e}")
+        if self.args.profanity is False:
+            self.extra_profanity_words = []
+
         self.feed_utils = FeedUtils()
         self.os_utils = OSUtils()
+        self.fs_utils = FSUtils()
+        self.proc_utils = ProcUtils()
         self.env_vars = []
-        handler = logging.FileHandler(getcwd() + f"{pathsep}logs{pathsep}sbs_latest.log")
+        handler = logging.FileHandler(
+            getcwd() + f"{pathsep}logs{pathsep}sbs_latest.log")
         self.logger = logging.getLogger("sbs_skill")
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
-        
-        self.handle_cmdline()
+
         self.feed_utils.parse_feed()
-        
+
     def handle_cmdline(self) -> Namespace:
-        self.arg_parser = ArgumentParser(description='ShowerThoughts Briefing Skill')
-        self.arg_parser.add_argument('-r', '--rate', help='The rate to refresh the ShowerThoughts (which feed to pull it from?)', required=True, dest='rate', type=str)
-        self.arg_parser.add_argument('-l', '--log', help='Log the output to a file?', required=False, action='store_true', default=False, dest='log', type=bool)
-        self.arg_parser.add_argument('-p', '--profanity', help='Filter out profanity?', required=True, action='store_true', default=False, dest='profanity', type=bool)
-        self.arg_parser.add_argument('-c', '--censor', help='Censor the profanity?', required=False, action='store_true', default=False, dest='censor', type=bool)
-        self.arg_parser.add_argument('-x', '--extra', help='Extra profanity word file to filter out profanity with', required=False, dest='extra', type=str)
-        self.arg_parser.add_argument('-d', '--debug', help='Debug mode?', required=False, action='store_true', default=False, dest='debug', type=bool)
-        self.arg_parser.add_argument('-e', '--experimental', help='Experimental mode?', required=False, action='store_true', default=False, dest='experimental', type=bool)
-        self.arg_parser.add_argument('-v', '--version', help='Show the version and exit', required=False, action='store_true', default=False, dest='version', type=bool)
-        self.arg_parser.add_argument('-f', '--feed', help='Save the thoughts to a RSS feed?', required=False, action='store_true', default=False, dest='feed', type=bool)
-        self.arg_parser.add_argument('-s', '--save', help='Save the thoughts to a text file?', required=False, action='store_true', default=False, dest='save', type=bool)
-        
+        self.arg_parser = ArgumentParser(
+            description='ShowerThoughts Briefing Skill')
+        self.arg_parser.add_argument(
+            '-r', '--rate', help='The rate to refresh the ShowerThoughts (which feed to pull it from?)', required=True, dest='rate', type=str)
+        self.arg_parser.add_argument('-p', '--profanity', help='Filter out profanity?',
+                                     required=True, action='store_true', default=True, dest='profanity', type=bool)
+        self.arg_parser.add_argument('-c', '--censor', help='Censor the profanity?',
+                                     required=False, action='store_true', default=True, dest='censor', type=bool)
+        self.arg_parser.add_argument(
+            '-x', '--extra-words', help='Extra profanity word file to filter out profanity with', required=False, dest='extra_words', type=str)
+        self.arg_parser.add_argument('-d', '--debug', help='Debug mode?', required=False,
+                                     action='store_true', default=False, dest='debug', type=bool)
+        self.arg_parser.add_argument('-e', '--experimental', help='Experimental mode?',
+                                     required=False, action='store_true', default=False, dest='experimental', type=bool)
+        self.arg_parser.add_argument('-f', '--feed', help='Save the thoughts to a RSS feed?',
+                                     required=False, action='store_true', default=False, dest='feed', type=bool)
+        self.arg_parser.add_argument('-s', '--save', help='Save the thoughts to a text file?',
+                                     required=False, action='store_true', default=False, dest='save', type=bool)
+
         self.args = self.arg_parser.parse_args()
-        
+
         return self.args
+
+    # Handle the main logic of the skill
+
+    def process_data(self):
+        # Elevate the process if needed
+        if self.proc_utils.is_elevated():
+            self.logger.debug(
+                'SBS Skill running with elevated privileges, no need to elevate...')
+        else:
+            self.logger.debug(
+                'SBS Skill not running with elevated privileges, elevating...')
+            self.proc_utils.elevate()
+
+        # Get the current process
+        self.current_process = self.proc_utils.get_current_process()
+
+        # Parse the Reddit RSS feed
+        self.feed_utils.parse_feed(
+            f"https://reddit.com/r/showerthoughts/top.rss?t={self.args.rate}&limit={self.args.limit}")
+
+        self.logger.debug('SBS Skill processing data...')
+
+        # Get the thoughts from the feed
+        self.current_thoughts = self.feed_utils.get_thoughts()
+
+        if self.args.save:
+            # Save the thoughts to a text file
+            self.fs_utils.save_thoughts(self.current_thoughts)
+
+        # Get the thoughts from the feed
+        self.feed_utils.generate_feed(self.current_thoughts)

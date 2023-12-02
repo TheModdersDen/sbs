@@ -136,4 +136,10 @@ logs/
 VARS_SET
 
 # Logs
-logs/*
+logs/*.log
+logs/*.txt
+
+# Environment files
+.env
+.env.*
+!.env.example

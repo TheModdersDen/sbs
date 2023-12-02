@@ -1,14 +1,26 @@
-
 {
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
-    },
-    "python.formatting.provider": "none",
-    "cSpell.words": [
-        "badwords",
-        "dateutil",
-        "gmtime",
-        "nlps",
-        "ntplib"
-    ]
+  "cSpell.language": "en-US",
+  "autopep8.formatOnSave": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "cSpell.words": [
+    "webserver",
+    "psutil",
+    "ntplib",
+    "nlps",
+    "lighttpd",
+    "gmtime",
+    "getpid",
+    "dateutil",
+    "gethostname",
+    "boto",
+    "badwords",
+    "autopep8"
+  ],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8"
+  },
+  "python.formatting.provider": "none"
 }

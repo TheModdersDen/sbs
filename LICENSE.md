@@ -30,11 +30,11 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 ## Acknowledgments
 
-* [TheModdersDen](https://github.com/TheModdersDen/) - The main author
-* [Python](https://www.python.org/downloads/release/python-3114/) - The language used
-* [GitHub](https://github.com/) - The platform used to host the code
-* [Visual Studio Code](https://code.visualstudio.com/) - The IDE used to write the code
-* [GitHub CoPilot](https://copilot.github.com/) - The AI used to help write the code
-* [GitKraken](https://www.gitkraken.com/) - The Git GUI used to manage the code
-* [AWS Lightsail](https://aws.amazon.com/lightsail/) - The hosting platform used to host the project
-* [Docker](https://www.docker.com/) - The containerization platform used to start the project
+- [TheModdersDen](https://github.com/TheModdersDen/) - The main author
+- [Python](https://www.python.org/downloads/release/python-3114/) - The language used
+- [GitHub](https://github.com/) - The platform used to host the code
+- [Visual Studio Code](https://code.visualstudio.com/) - The IDE used to write the code
+- [GitHub CoPilot](https://copilot.github.com/) - The AI used to help write the code
+- [GitKraken](https://www.gitkraken.com/) - The Git GUI used to manage the code
+- [AWS Lightsail](https://aws.amazon.com/lightsail/) - The hosting platform used to host the project
+- [Docker](https://www.docker.com/) - The containerization platform used to start the project
