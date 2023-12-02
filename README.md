@@ -2,7 +2,7 @@
 
 ## Description
 
-A r/ShowerThoughts Briefing Skill for Alexa, originally created for personal use, but soon to be available for public use.
+A /r/ShowerThoughts Briefing Skill for Alexa, originally created for personal use, but soon to be available for public use.
 
 ## TODO
 
